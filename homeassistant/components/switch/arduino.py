@@ -26,13 +26,13 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         _LOGGER.error('A connection has not been made to the Arduino board.')
         return False
 
-    switches = []
     pins = config.get('pins')
-    for pinnum, pin in pins.items():
-        if pin.get('name'):
-            switches.append(ArduinoSwitch(pin.get('name'),
-                                          pinnum,
-                                          pin.get('type')))
+    switches = [
+        ArduinoSwitch(pin.get('name'), pinnum, pin.get('type'))
+        for pinnum, pin in pins.items()
+        if pin.get('name')
+    ]
+
     add_devices(switches)
 
 

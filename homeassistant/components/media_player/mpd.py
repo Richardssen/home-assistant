@@ -63,15 +63,14 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         return False
     except mpd.CommandError as error:
 
-        if "incorrect password" in str(error):
-            _LOGGER.error(
-                "MPD reported incorrect password. "
-                "Please check your password.")
-
-            return False
-        else:
+        if "incorrect password" not in str(error):
             raise
 
+        _LOGGER.error(
+            "MPD reported incorrect password. "
+            "Please check your password.")
+
+        return False
     add_devices([MpdDevice(daemon, port, location, password)])
 
 
@@ -144,10 +143,7 @@ class MpdDevice(MediaPlayerDevice):
         name = self.currentsong.get('name', None)
         title = self.currentsong['title']
 
-        if name is None:
-            return title
-        else:
-            return '{}: {}'.format(name, title)
+        return title if name is None else f'{name}: {title}'
 
     @property
     def media_artist(self):

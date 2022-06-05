@@ -47,7 +47,7 @@ class WinkSensorDevice(Entity):
     @property
     def unique_id(self):
         """ Returns the id of this wink sensor """
-        return "{}.{}".format(self.__class__, self.wink.device_id())
+        return f"{self.__class__}.{self.wink.device_id()}"
 
     @property
     def name(self):
@@ -78,7 +78,7 @@ class WinkEggMinder(Entity):
     @property
     def unique_id(self):
         """ Returns the id of this wink Egg Minder """
-        return "{}.{}".format(self.__class__, self.wink.device_id())
+        return f"{self.__class__}.{self.wink.device_id()}"
 
     @property
     def name(self):

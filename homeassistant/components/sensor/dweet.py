@@ -87,11 +87,10 @@ class DweetSensor(Entity):
         """ Returns the state. """
         if self.dweet.data is None:
             return STATE_UNKNOWN
-        else:
-            values = json.dumps(self.dweet.data[0]['content'])
-            value = template.render_with_possible_json_value(
-                self.hass, self._value_template, values)
-            return value
+        values = json.dumps(self.dweet.data[0]['content'])
+        return template.render_with_possible_json_value(
+            self.hass, self._value_template, values
+        )
 
     def update(self):
         """ Gets the latest data from REST API. """

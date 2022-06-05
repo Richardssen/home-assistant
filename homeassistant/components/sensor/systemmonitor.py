@@ -58,7 +58,7 @@ class SystemMonitorSensor(Entity):
     """ A system monitor sensor. """
 
     def __init__(self, sensor_type, argument=''):
-        self._name = SENSOR_TYPES[sensor_type][0] + ' ' + argument
+        self._name = f'{SENSOR_TYPES[sensor_type][0]} {argument}'
         self.argument = argument
         self.type = sensor_type
         self._state = None

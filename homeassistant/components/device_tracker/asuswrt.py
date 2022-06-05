@@ -79,12 +79,18 @@ class AsusWrtDeviceScanner(object):
 
     def get_device_name(self, device):
         """ Returns the name of the given device or None if we don't know. """
-        if not self.last_results:
-            return None
-        for client in self.last_results:
-            if client['mac'] == device:
-                return client['host']
-        return None
+        return (
+            next(
+                (
+                    client['host']
+                    for client in self.last_results
+                    if client['mac'] == device
+                ),
+                None,
+            )
+            if self.last_results
+            else None
+        )
 
     @Throttle(MIN_TIME_BETWEEN_SCANS)
     def _update_info(self):
@@ -101,10 +107,12 @@ class AsusWrtDeviceScanner(object):
             if not data:
                 return False
 
-            active_clients = [client for client in data.values() if
-                              client['status'] == 'REACHABLE' or
-                              client['status'] == 'DELAY' or
-                              client['status'] == 'STALE']
+            active_clients = [
+                client
+                for client in data.values()
+                if client['status'] in ['REACHABLE', 'DELAY', 'STALE']
+            ]
+
             self.last_results = active_clients
             return True
 

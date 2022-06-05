@@ -46,7 +46,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         try:
             tstat = radiotherm.get_thermostat(host)
             tstats.append(RadioThermostat(tstat, hold_temp))
-        except (URLError, OSError):
+        except OSError:
             _LOGGER.exception("Unable to connect to Radio Thermostat: %s",
                               host)
 
@@ -119,10 +119,7 @@ class RadioThermostat(ThermostatDevice):
             self.device.t_cool = temperature
         elif self._operation == STATE_HEAT:
             self.device.t_heat = temperature
-        if self.hold_temp:
-            self.device.hold = 1
-        else:
-            self.device.hold = 0
+        self.device.hold = 1 if self.hold_temp else 0
 
     def set_time(self):
         """ Set device time """

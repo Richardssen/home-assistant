@@ -57,8 +57,7 @@ class TwitchSensor(Entity):
     def update(self):
         """ Update device state. """
         from twitch.api import v3 as twitch
-        stream = twitch.streams.by_channel(self._channel).get('stream')
-        if stream:
+        if stream := twitch.streams.by_channel(self._channel).get('stream'):
             self._game = stream.get('channel').get('game')
             self._title = stream.get('channel').get('status')
             self._preview = stream.get('preview').get('small')

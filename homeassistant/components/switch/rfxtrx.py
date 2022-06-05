@@ -65,7 +65,7 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
                 event.device.subtype
             )
             pkt_id = "".join("{0:02x}".format(x) for x in event.data)
-            entity_name = "%s : %s" % (entity_id, pkt_id)
+            entity_name = f"{entity_id} : {pkt_id}"
             datas = {ATTR_STATE: False, ATTR_FIREEVENT: False}
             new_switch = RfxtrxSwitch(entity_name, event, datas)
             rfxtrx.RFX_DEVICES[entity_id] = new_switch
@@ -79,8 +79,7 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
                 entity_id,
                 event.values['Command']
             )
-            if event.values['Command'] == 'On'\
-                    or event.values['Command'] == 'Off':
+            if event.values['Command'] in ['On', 'Off']:
 
                 # Update the rfxtrx device state
                 is_on = event.values['Command'] == 'On'

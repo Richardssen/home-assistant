@@ -80,11 +80,12 @@ class ArduinoBoard(object):
             self._board.set_pin_mode(pin,
                                      self._board.OUTPUT,
                                      self._board.ANALOG)
-        elif mode == 'digital' and direction == 'in':
-            self._board.set_pin_mode(pin,
-                                     self._board.OUTPUT,
-                                     self._board.DIGITAL)
-        elif mode == 'digital' and direction == 'out':
+        elif (
+            mode == 'digital'
+            and direction == 'in'
+            or mode == 'digital'
+            and direction == 'out'
+        ):
             self._board.set_pin_mode(pin,
                                      self._board.OUTPUT,
                                      self._board.DIGITAL)

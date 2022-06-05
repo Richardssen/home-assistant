@@ -25,7 +25,7 @@ def explore_module(package, explore_children):
     if not hasattr(module, '__path__'):
         return found
 
-    for _, name, ispkg in pkgutil.iter_modules(module.__path__, package + '.'):
+    for _, name, ispkg in pkgutil.iter_modules(module.__path__, f'{package}.'):
         found.append(name)
 
         if explore_children:
@@ -37,8 +37,8 @@ def explore_module(package, explore_children):
 def core_requirements():
     """ Gather core requirements out of setup.py. """
     with open('setup.py') as inp:
-        reqs_raw = re.search(
-            r'REQUIRES = \[(.*?)\]', inp.read(), re.S).group(1)
+        reqs_raw = re.search(r'REQUIRES = \[(.*?)\]', inp.read(), re.S)[1]
+
     return re.findall(r"'(.*?)'", reqs_raw)
 
 
@@ -52,8 +52,6 @@ def gather_modules():
     reqs = OrderedDict()
 
     errors = []
-    output = []
-
     for package in sorted(explore_module('homeassistant.components', True)):
         try:
             module = importlib.import_module(package)
@@ -73,14 +71,14 @@ def gather_modules():
         print("Make sure you import 3rd party libraries inside methods.")
         return None
 
-    output.append('# Home Assistant core')
-    output.append('\n')
-    output.append('\n'.join(core_requirements()))
-    output.append('\n')
+    output = ['# Home Assistant core', '\n', '\n'.join(core_requirements()), '\n']
     for pkg, requirements in reqs.items():
-        for req in sorted(requirements,
-                          key=lambda name: (len(name.split('.')), name)):
-            output.append('\n# {}'.format(req))
+        output.extend(
+            '\n# {}'.format(req)
+            for req in sorted(
+                requirements, key=lambda name: (len(name.split('.')), name)
+            )
+        )
 
         if comment_requirement(pkg):
             output.append('\n# {}\n'.format(pkg))

@@ -52,10 +52,8 @@ class HomeAssistantLogFilter(logging.Filter):
 def setup(hass, config=None):
     """ Setup the logger component. """
 
-    logfilter = dict()
+    logfilter = {LOGGER_DEFAULT: LOGSEVERITY['DEBUG']}
 
-    # Set default log severity
-    logfilter[LOGGER_DEFAULT] = LOGSEVERITY['DEBUG']
     if LOGGER_DEFAULT in config.get(DOMAIN):
         logfilter[LOGGER_DEFAULT] = LOGSEVERITY[
             config.get(DOMAIN)[LOGGER_DEFAULT].upper()

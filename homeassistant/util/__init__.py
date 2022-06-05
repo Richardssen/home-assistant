@@ -50,8 +50,10 @@ def repr_helper(inp):
     """ Helps creating a more readable string representation of objects. """
     if isinstance(inp, dict):
         return ", ".join(
-            repr_helper(key)+"="+repr_helper(item) for key, item
-            in inp.items())
+            f"{repr_helper(key)}={repr_helper(item)}"
+            for key, item in inp.items()
+        )
+
     elif isinstance(inp, datetime):
         return datetime_to_local_str(inp)
     else:
@@ -77,7 +79,7 @@ def ensure_unique_string(preferred_string, current_strings):
 
     while test_string in current_strings:
         tries += 1
-        test_string = "{}_{}".format(preferred_string, tries)
+        test_string = f"{preferred_string}_{tries}"
 
     return test_string
 
@@ -200,9 +202,11 @@ class OrderedSet(collections.MutableSet):
             self.add(item)
 
     def __repr__(self):
-        if not self:
-            return '%s()' % (self.__class__.__name__,)
-        return '%s(%r)' % (self.__class__.__name__, list(self))
+        return (
+            '%s(%r)' % (self.__class__.__name__, list(self))
+            if self
+            else f'{self.__class__.__name__}()'
+        )
 
     def __eq__(self, other):
         if isinstance(other, OrderedSet):

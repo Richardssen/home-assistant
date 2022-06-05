@@ -87,7 +87,7 @@ class VeraSwitch(ToggleEntity):
         attr = super().state_attributes or {}
 
         if self.vera_device.has_battery:
-            attr[ATTR_BATTERY_LEVEL] = self.vera_device.battery_level + '%'
+            attr[ATTR_BATTERY_LEVEL] = f'{self.vera_device.battery_level}%'
 
         if self.vera_device.is_armable:
             armed = self.vera_device.refresh_value('Armed')

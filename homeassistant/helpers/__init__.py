@@ -38,7 +38,7 @@ def extract_entity_ids(hass, service):
     if isinstance(service_ent_id, str):
         return group.expand_entity_ids(hass, [service_ent_id.lower()])
 
-    return [ent_id for ent_id in group.expand_entity_ids(hass, service_ent_id)]
+    return list(group.expand_entity_ids(hass, service_ent_id))
 
 
 def validate_config(config, items, logger):
@@ -55,12 +55,13 @@ def validate_config(config, items, logger):
     for domain in items.keys():
         config.setdefault(domain, {})
 
-        errors = [item for item in items[domain] if item not in config[domain]]
-
-        if errors:
+        if errors := [
+            item for item in items[domain] if item not in config[domain]
+        ]:
             logger.error(
-                "Missing required configuration items in {}: {}".format(
-                    domain, ", ".join(errors)))
+                f'Missing required configuration items in {domain}: {", ".join(errors)}'
+            )
+
 
             errors_found = True
 
@@ -73,9 +74,7 @@ def config_per_platform(config, domain, logger):
     For example, will find 'switch', 'switch 2', 'switch 3', .. etc
     """
     config_key = domain
-    found = 1
-
-    for config_key in extract_domain_configs(config, domain):
+    for found, config_key in enumerate(extract_domain_configs(config, domain), start=2):
         platform_config = config[config_key]
         if not isinstance(platform_config, list):
             platform_config = [platform_config]
@@ -89,11 +88,10 @@ def config_per_platform(config, domain, logger):
 
             yield platform_type, item
 
-        found += 1
-        config_key = "{} {}".format(domain, found)
+        config_key = f"{domain} {found}"
 
 
 def extract_domain_configs(config, domain):
     """ Extract keys from config for given domain name. """
-    pattern = re.compile(r'^{}(| .+)$'.format(domain))
+    pattern = re.compile(f'^{domain}(| .+)$')
     return (key for key in config.keys() if pattern.match(key))

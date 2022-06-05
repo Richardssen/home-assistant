@@ -66,8 +66,7 @@ class ArestBinarySensor(BinarySensorDevice):
         self.update()
 
         if self._pin is not None:
-            request = requests.get('{}/mode/{}/i'.format
-                                   (self._resource, self._pin), timeout=10)
+            request = requests.get(f'{self._resource}/mode/{self._pin}/i', timeout=10)
             if request.status_code is not 200:
                 _LOGGER.error("Can't set mode. Is device offline?")
 
@@ -99,8 +98,7 @@ class ArestData(object):
     def update(self):
         """ Gets the latest data from aREST device. """
         try:
-            response = requests.get('{}/digital/{}'.format(
-                self._resource, self._pin), timeout=10)
+            response = requests.get(f'{self._resource}/digital/{self._pin}', timeout=10)
             self.data = {'state': response.json()['return_value']}
         except requests.exceptions.ConnectionError:
             _LOGGER.error("No route to device '%s'. Is device offline?",

@@ -96,15 +96,18 @@ class ZWaveSensor(Entity):
     @property
     def unique_id(self):
         """ Returns a unique id. """
-        return "ZWAVE-{}-{}".format(self._node.node_id, self._value.object_id)
+        return f"ZWAVE-{self._node.node_id}-{self._value.object_id}"
 
     @property
     def name(self):
         """ Returns the name of the device. """
-        name = self._node.name or "{} {}".format(
-            self._node.manufacturer_name, self._node.product_name)
+        name = (
+            self._node.name
+            or f"{self._node.manufacturer_name} {self._node.product_name}"
+        )
 
-        return "{} {}".format(name, self._value.label)
+
+        return f"{name} {self._value.label}"
 
     @property
     def state(self):
@@ -123,9 +126,7 @@ class ZWaveSensor(Entity):
         if battery_level is not None:
             attrs[ATTR_BATTERY_LEVEL] = battery_level
 
-        location = self._node.location
-
-        if location:
+        if location := self._node.location:
             attrs[ATTR_LOCATION] = location
 
         return attrs

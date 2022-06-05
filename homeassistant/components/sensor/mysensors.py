@@ -57,7 +57,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                 node[child_id] = {}
             for value_type, value in child.values.items():
                 if value_type not in node[child_id]:
-                    name = '{} {}.{}'.format(sensor.sketch_name, nid, child.id)
+                    name = f'{sensor.sketch_name} {nid}.{child.id}'
                     node[child_id][value_type] = \
                         MySensorsNodeValue(
                             nid, child_id, name, value_type, is_metric, const)
@@ -129,9 +129,11 @@ class MySensorsNodeValue(Entity):
         """ Unit of measurement of this entity. """
         if self.value_type == self.const.SetReq.V_TEMP:
             return TEMP_CELCIUS if self.metric else TEMP_FAHRENHEIT
-        elif self.value_type == self.const.SetReq.V_HUM or \
-                self.value_type == self.const.SetReq.V_DIMMER or \
-                self.value_type == self.const.SetReq.V_LIGHT_LEVEL:
+        elif self.value_type in [
+            self.const.SetReq.V_HUM,
+            self.const.SetReq.V_DIMMER,
+            self.const.SetReq.V_LIGHT_LEVEL,
+        ]:
             return '%'
         return None
 
@@ -147,8 +149,10 @@ class MySensorsNodeValue(Entity):
     def update_sensor(self, value, battery_level):
         """ Update a sensor with the latest value from the controller. """
         _LOGGER.info("%s value = %s", self._name, value)
-        if self.value_type == self.const.SetReq.V_TRIPPED or \
-           self.value_type == self.const.SetReq.V_ARMED:
+        if self.value_type in [
+            self.const.SetReq.V_TRIPPED,
+            self.const.SetReq.V_ARMED,
+        ]:
             self._value = STATE_ON if int(value) == 1 else STATE_OFF
         else:
             self._value = value

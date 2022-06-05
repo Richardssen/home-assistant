@@ -47,9 +47,10 @@ def _arp(ip_address):
     cmd = ['arp', '-n', ip_address]
     arp = subprocess.Popen(cmd, stdout=subprocess.PIPE)
     out, _ = arp.communicate()
-    match = re.search(r'(([0-9A-Fa-f]{1,2}\:){5}[0-9A-Fa-f]{1,2})', str(out))
-    if match:
-        return match.group(0)
+    if match := re.search(
+        r'(([0-9A-Fa-f]{1,2}\:){5}[0-9A-Fa-f]{1,2})', str(out)
+    ):
+        return match[0]
     _LOGGER.info("No MAC address found for %s", ip_address)
     return None
 
@@ -79,10 +80,9 @@ class NmapDeviceScanner(object):
     def get_device_name(self, mac):
         """ Returns the name of the given device or None if we don't know. """
 
-        filter_named = [device.name for device in self.last_results
-                        if device.mac == mac]
-
-        if filter_named:
+        if filter_named := [
+            device.name for device in self.last_results if device.mac == mac
+        ]:
             return filter_named[0]
         else:
             return None

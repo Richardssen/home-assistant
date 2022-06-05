@@ -33,21 +33,27 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                       resource)
         return False
 
-    dev = []
     pins = config.get('pins', {})
-    for pinnum, pin in pins.items():
-        dev.append(ArestSwitchPin(resource,
-                                  config.get('name', response.json()['name']),
-                                  pin.get('name'),
-                                  pinnum))
+    dev = [
+        ArestSwitchPin(
+            resource,
+            config.get('name', response.json()['name']),
+            pin.get('name'),
+            pinnum,
+        )
+        for pinnum, pin in pins.items()
+    ]
 
     functions = config.get('functions', {})
-    for funcname, func in functions.items():
-        dev.append(ArestSwitchFunction(resource,
-                                       config.get('name',
-                                                  response.json()['name']),
-                                       func.get('name'),
-                                       funcname))
+    dev.extend(
+        ArestSwitchFunction(
+            resource,
+            config.get('name', response.json()['name']),
+            func.get('name'),
+            funcname,
+        )
+        for funcname, func in functions.items()
+    )
 
     add_devices(dev)
 
@@ -57,8 +63,7 @@ class ArestSwitchBase(SwitchDevice):
 
     def __init__(self, resource, location, name):
         self._resource = resource
-        self._name = '{} {}'.format(location.title(), name.title()) \
-                     or DEVICE_DEFAULT_NAME
+        self._name = f'{location.title()} {name.title()}' or DEVICE_DEFAULT_NAME
         self._state = None
 
     @property
@@ -79,8 +84,7 @@ class ArestSwitchFunction(ArestSwitchBase):
         super().__init__(resource, location, name)
         self._func = func
 
-        request = requests.get('{}/{}'.format(self._resource, self._func),
-                               timeout=10)
+        request = requests.get(f'{self._resource}/{self._func}', timeout=10)
 
         if request.status_code is not 200:
             _LOGGER.error("Can't find function. Is device offline?")
@@ -96,8 +100,10 @@ class ArestSwitchFunction(ArestSwitchBase):
 
     def turn_on(self, **kwargs):
         """ Turn the device on. """
-        request = requests.get('{}/{}'.format(self._resource, self._func),
-                               timeout=10, params={"params": "1"})
+        request = requests.get(
+            f'{self._resource}/{self._func}', timeout=10, params={"params": "1"}
+        )
+
 
         if request.status_code == 200:
             self._state = True
@@ -108,8 +114,10 @@ class ArestSwitchFunction(ArestSwitchBase):
 
     def turn_off(self, **kwargs):
         """ Turn the device off. """
-        request = requests.get('{}/{}'.format(self._resource, self._func),
-                               timeout=10, params={"params": "0"})
+        request = requests.get(
+            f'{self._resource}/{self._func}', timeout=10, params={"params": "0"}
+        )
+
 
         if request.status_code == 200:
             self._state = False
@@ -120,8 +128,7 @@ class ArestSwitchFunction(ArestSwitchBase):
 
     def update(self):
         """ Gets the latest data from aREST API and updates the state. """
-        request = requests.get('{}/{}'.format(self._resource,
-                                              self._func), timeout=10)
+        request = requests.get(f'{self._resource}/{self._func}', timeout=10)
         self._state = request.json()['return_value'] != 0
 
 
@@ -132,15 +139,13 @@ class ArestSwitchPin(ArestSwitchBase):
         super().__init__(resource, location, name)
         self._pin = pin
 
-        request = requests.get('{}/mode/{}/o'.format(self._resource,
-                                                     self._pin), timeout=10)
+        request = requests.get(f'{self._resource}/mode/{self._pin}/o', timeout=10)
         if request.status_code is not 200:
             _LOGGER.error("Can't set mode. Is device offline?")
 
     def turn_on(self, **kwargs):
         """ Turn the device on. """
-        request = requests.get('{}/digital/{}/1'.format(self._resource,
-                                                        self._pin), timeout=10)
+        request = requests.get(f'{self._resource}/digital/{self._pin}/1', timeout=10)
         if request.status_code == 200:
             self._state = True
         else:
@@ -149,8 +154,7 @@ class ArestSwitchPin(ArestSwitchBase):
 
     def turn_off(self, **kwargs):
         """ Turn the device off. """
-        request = requests.get('{}/digital/{}/0'.format(self._resource,
-                                                        self._pin), timeout=10)
+        request = requests.get(f'{self._resource}/digital/{self._pin}/0', timeout=10)
         if request.status_code == 200:
             self._state = False
         else:
@@ -159,6 +163,5 @@ class ArestSwitchPin(ArestSwitchBase):
 
     def update(self):
         """ Gets the latest data from aREST API and updates the state. """
-        request = requests.get('{}/digital/{}'.format(self._resource,
-                                                      self._pin), timeout=10)
+        request = requests.get(f'{self._resource}/digital/{self._pin}', timeout=10)
         self._state = request.json()['return_value'] != 0

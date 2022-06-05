@@ -67,8 +67,7 @@ def setup(hass, config):
     def service_handler(service):
         """ Execute a service call to script.<script name>. """
         entity_id = ENTITY_ID_FORMAT.format(service.service)
-        script = component.entities.get(entity_id)
-        if script:
+        if script := component.entities.get(entity_id):
             script.turn_on()
 
     for object_id, cfg in config[DOMAIN].items():
@@ -115,8 +114,9 @@ class Script(ToggleEntity):
         self._cur = -1
         self._last_action = None
         self._listener = None
-        self._can_cancel = not any(CONF_DELAY in action for action
-                                   in self.sequence)
+        self._can_cancel = all(
+            CONF_DELAY not in action for action in self.sequence
+        )
 
     @property
     def should_poll(self):

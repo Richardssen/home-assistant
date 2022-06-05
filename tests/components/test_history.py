@@ -54,7 +54,7 @@ class TestComponentHistory(unittest.TestCase):
         entity_id = 'test.last_5_states'
 
         for i in range(7):
-            self.hass.states.set(entity_id, "State {}".format(i))
+            self.hass.states.set(entity_id, f"State {i}")
 
             if i > 1:
                 states.append(self.hass.states.get(entity_id))
@@ -72,9 +72,9 @@ class TestComponentHistory(unittest.TestCase):
 
         for i in range(5):
             state = ha.State(
-                'test.point_in_time_{}'.format(i % 5),
-                "State {}".format(i),
-                {'attribute_test': i})
+                f'test.point_in_time_{i % 5}', f"State {i}", {'attribute_test': i}
+            )
+
 
             mock_state_change_event(self.hass, state)
             self.hass.pool.block_till_done()
@@ -88,9 +88,11 @@ class TestComponentHistory(unittest.TestCase):
         with patch('homeassistant.util.dt.utcnow', return_value=point):
             for i in range(5):
                 state = ha.State(
-                    'test.point_in_time_{}'.format(i % 5),
-                    "State {}".format(i),
-                    {'attribute_test': i})
+                    f'test.point_in_time_{i % 5}',
+                    f"State {i}",
+                    {'attribute_test': i},
+                )
+
 
                 mock_state_change_event(self.hass, state)
                 self.hass.pool.block_till_done()

@@ -38,10 +38,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     serport = connection.connection(ipaddress, port)
     serport.open()
 
-    tstats = []
-    if CONF_TSTATS in config:
-        tstats = config[CONF_TSTATS]
-
+    tstats = config[CONF_TSTATS] if CONF_TSTATS in config else []
     if tstats is None:
         _LOGGER.error("No thermostats configured.")
         return False
@@ -108,7 +105,7 @@ class HeatmiserV3Thermostat(ThermostatDevice):
             temperature,
             1,
             self.serport)
-        self._target_temperature = int(temperature)
+        self._target_temperature = temperature
 
     def update(self):
         self.dcb = self.heatmiser.hmReadAddress(

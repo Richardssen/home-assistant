@@ -55,5 +55,7 @@ class TestComponentsCore(unittest.TestCase):
             'zone 100': None,
         }
 
-        self.assertEqual(set(['zone', 'zone Hallo', 'zone 100']),
-                         set(helpers.extract_domain_configs(config, 'zone')))
+        self.assertEqual(
+            {'zone', 'zone Hallo', 'zone 100'},
+            set(helpers.extract_domain_configs(config, 'zone')),
+        )

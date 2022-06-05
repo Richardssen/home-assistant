@@ -48,19 +48,16 @@ def setup(hass, config):
             name = config_block.get(CONF_ALIAS, config_key)
             _setup_automation(hass, config_block, name, config)
 
-        # check for multiple block syntax
         elif isinstance(config[config_key], list):
             for list_no, config_block in enumerate(config[config_key]):
-                name = config_block.get(CONF_ALIAS,
-                                        "{}, {}".format(config_key, list_no))
+                name = config_block.get(CONF_ALIAS, f"{config_key}, {list_no}")
                 _setup_automation(hass, config_block, name, config)
 
-        # any scalar value is incorrect
         else:
             _LOGGER.error('Error in config in section %s.', config_key)
 
         found += 1
-        config_key = "{} {}".format(DOMAIN, found)
+        config_key = f"{DOMAIN} {found}"
 
     return True
 

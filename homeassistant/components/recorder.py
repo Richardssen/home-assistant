@@ -136,9 +136,13 @@ class RecorderRun(object):
             where += "AND created < ? "
             where_data.append(point_in_time or self.end)
 
-        return [row[0] for row in query(
-            "SELECT entity_id FROM states WHERE {}"
-            "GROUP BY entity_id".format(where), where_data)]
+        return [
+            row[0]
+            for row in query(
+                f"SELECT entity_id FROM states WHERE {where}GROUP BY entity_id",
+                where_data,
+            )
+        ]
 
     @property
     def where_after_start_run(self):
@@ -146,7 +150,7 @@ class RecorderRun(object):
         Returns SQL WHERE clause to select rows created after the start of the
         run.
         """
-        return "created >= {} ".format(_adapt_datetime(self.start))
+        return f"created >= {_adapt_datetime(self.start)} "
 
     @property
     def where_limit_to_run(self):
@@ -154,7 +158,7 @@ class RecorderRun(object):
         where = self.where_after_start_run
 
         if self.end is not None:
-            where += "AND created < {} ".format(_adapt_datetime(self.end))
+            where += f"AND created < {_adapt_datetime(self.end)} "
 
         return where
 

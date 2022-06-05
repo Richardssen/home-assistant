@@ -87,7 +87,7 @@ class Thermostat(ThermostatDevice):
     @property
     def target_temperature(self):
         """ Returns the temperature we try to reach. """
-        if self.hvac_mode == 'heat' or self.hvac_mode == 'auxHeatOnly':
+        if self.hvac_mode in ['heat', 'auxHeatOnly']:
             return self.target_temperature_low
         elif self.hvac_mode == 'cool':
             return self.target_temperature_high
@@ -118,10 +118,7 @@ class Thermostat(ThermostatDevice):
     @property
     def fan(self):
         """ Returns the current fan state. """
-        if 'fan' in self.thermostat['equipmentStatus']:
-            return STATE_ON
-        else:
-            return STATE_OFF
+        return STATE_ON if 'fan' in self.thermostat['equipmentStatus'] else STATE_OFF
 
     @property
     def operation(self):
@@ -131,9 +128,7 @@ class Thermostat(ThermostatDevice):
             return STATE_IDLE
         elif 'Cool' in status:
             return STATE_COOL
-        elif 'auxHeat' in status:
-            return STATE_HEAT
-        elif 'heatPump' in status:
+        elif 'auxHeat' in status or 'heatPump' in status:
             return STATE_HEAT
         else:
             return status

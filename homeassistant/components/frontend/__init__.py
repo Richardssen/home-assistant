@@ -61,7 +61,7 @@ def _handle_get_root(handler, path_match, data):
     if handler.server.development:
         app_url = "home-assistant-polymer/src/home-assistant.html"
     else:
-        app_url = "frontend-{}.html".format(version.VERSION)
+        app_url = f"frontend-{version.VERSION}.html"
 
     # auto login if no password was set, else check api_password param
     auth = ('no_password_set' if handler.server.api_password is None
@@ -92,9 +92,7 @@ def _handle_get_static(handler, path_match, data):
     """ Returns a static file for the frontend. """
     req_file = util.sanitize_path(path_match.group('file'))
 
-    # Strip md5 hash out
-    fingerprinted = _FINGERPRINT.match(req_file)
-    if fingerprinted:
+    if fingerprinted := _FINGERPRINT.match(req_file):
         req_file = "{}.{}".format(*fingerprinted.groups())
 
     path = os.path.join(os.path.dirname(__file__), 'www_static', req_file)

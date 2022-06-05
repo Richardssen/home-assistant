@@ -66,14 +66,11 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                 continue
             sensor_name = str(ts_sensor.id)
 
-        for datatype in sensor_value_descriptions.keys():
-            if datatype & datatype_mask and ts_sensor.has_value(datatype):
-
-                sensor_info = sensor_value_descriptions[datatype]
-
-                sensors.append(
-                    TellstickSensor(
-                        sensor_name, ts_sensor, datatype, sensor_info))
+        sensors.extend(
+            TellstickSensor(sensor_name, ts_sensor, datatype, sensor_info)
+            for datatype, sensor_info in sensor_value_descriptions.items()
+            if datatype & datatype_mask and ts_sensor.has_value(datatype)
+        )
 
     add_devices(sensors)
 
@@ -86,7 +83,7 @@ class TellstickSensor(Entity):
         self.sensor = sensor
         self._unit_of_measurement = sensor_info.unit or None
 
-        self._name = "{} {}".format(name, sensor_info.name)
+        self._name = f"{name} {sensor_info.name}"
 
     @property
     def name(self):

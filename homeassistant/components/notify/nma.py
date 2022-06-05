@@ -28,8 +28,10 @@ def get_service(hass, config):
                            _LOGGER):
         return None
 
-    response = requests.get(_RESOURCE + 'verify',
-                            params={"apikey": config[CONF_API_KEY]})
+    response = requests.get(
+        f'{_RESOURCE}verify', params={"apikey": config[CONF_API_KEY]}
+    )
+
     tree = ET.fromstring(response.content)
 
     if tree[0].tag == 'error':
@@ -57,7 +59,7 @@ class NmaNotificationService(BaseNotificationService):
             "priority": 0,
         }
 
-        response = requests.get(_RESOURCE + 'notify', params=data)
+        response = requests.get(f'{_RESOURCE}notify', params=data)
         tree = ET.fromstring(response.content)
 
         if tree[0].tag == 'error':

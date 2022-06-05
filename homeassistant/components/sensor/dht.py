@@ -88,7 +88,7 @@ class DHTSensor(Entity):
 
     @property
     def name(self):
-        return '{} {}'.format(self.client_name, self._name)
+        return f'{self.client_name} {self._name}'
 
     @property
     def state(self):
@@ -121,7 +121,7 @@ class DHTClient(object):
         self.adafruit_dht = adafruit_dht
         self.sensor = sensor
         self.pin = pin
-        self.data = dict()
+        self.data = {}
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):

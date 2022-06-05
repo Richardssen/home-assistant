@@ -32,21 +32,32 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
         _LOGGER.error("Missing required variable: command_topic")
         return False
 
-    add_devices_callback([MqttLight(
-        hass,
-        config.get('name', DEFAULT_NAME),
-        {key: config.get(key) for key in
-         (typ + topic
-          for typ in ('', 'brightness_', 'rgb_')
-          for topic in ('state_topic', 'command_topic'))},
-        {key: config.get(key + '_value_template')
-         for key in ('state', 'brightness', 'rgb')},
-        config.get('qos', DEFAULT_QOS),
-        {
-            'on': config.get('payload_on', DEFAULT_PAYLOAD_ON),
-            'off': config.get('payload_off', DEFAULT_PAYLOAD_OFF)
-        },
-        config.get('optimistic', DEFAULT_OPTIMISTIC))])
+    add_devices_callback(
+        [
+            MqttLight(
+                hass,
+                config.get('name', DEFAULT_NAME),
+                {
+                    key: config.get(key)
+                    for key in (
+                        typ + topic
+                        for typ in ('', 'brightness_', 'rgb_')
+                        for topic in ('state_topic', 'command_topic')
+                    )
+                },
+                {
+                    key: config.get(f'{key}_value_template')
+                    for key in ('state', 'brightness', 'rgb')
+                },
+                config.get('qos', DEFAULT_QOS),
+                {
+                    'on': config.get('payload_on', DEFAULT_PAYLOAD_ON),
+                    'off': config.get('payload_off', DEFAULT_PAYLOAD_OFF),
+                },
+                config.get('optimistic', DEFAULT_OPTIMISTIC),
+            )
+        ]
+    )
 
 
 class MqttLight(Light):

@@ -37,8 +37,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     try:
         for location in [config.get('from', None), config.get('to', None)]:
             # transport.opendata.ch doesn't play nice with requests.Session
-            result = requests.get(_RESOURCE + 'locations?query=%s' % location,
-                                  timeout=10)
+            result = requests.get(_RESOURCE + f'locations?query={location}', timeout=10)
             journey.append(result.json()['stations'][0]['name'])
     except KeyError:
         _LOGGER.exception(
@@ -46,9 +45,8 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
             "Check your settings and/or the availability of opendata.ch")
         return False
 
-    dev = []
     data = PublicTransportData(journey)
-    dev.append(SwissPublicTransportSensor(data, journey))
+    dev = [SwissPublicTransportSensor(data, journey)]
     add_devices(dev)
 
 
@@ -82,8 +80,7 @@ class SwissPublicTransportSensor(Entity):
                 ATTR_DEPARTURE_TIME2: self._times[1],
                 ATTR_START: self._from,
                 ATTR_TARGET: self._to,
-                ATTR_REMAINING_TIME: '{}'.format(
-                    ':'.join(str(self._times[2]).split(':')[:2]))
+                ATTR_REMAINING_TIME: f"{':'.join(str(self._times[2]).split(':')[:2])}",
             }
 
     # pylint: disable=too-many-branches

@@ -171,8 +171,7 @@ class HueLight(Light):
     @property
     def unique_id(self):
         """ Returns the id of this Hue light """
-        return "{}.{}".format(
-            self.__class__, self.info.get('uniqueid', self.name))
+        return f"{self.__class__}.{self.info.get('uniqueid', self.name)}"
 
     @property
     def name(self):
@@ -231,11 +230,7 @@ class HueLight(Light):
 
         effect = kwargs.get(ATTR_EFFECT)
 
-        if effect == EFFECT_COLORLOOP:
-            command['effect'] = 'colorloop'
-        else:
-            command['effect'] = 'none'
-
+        command['effect'] = 'colorloop' if effect == EFFECT_COLORLOOP else 'none'
         self.bridge.set_light(self.light_id, command)
 
     def turn_off(self, **kwargs):

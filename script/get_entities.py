@@ -31,7 +31,7 @@ def main(password, askpass, attrs, address, port):
 
     # parse data
     output = {'entity_id': []}
-    output.update([(attr, []) for attr in attrs])
+    output |= [(attr, []) for attr in attrs]
     for item in data:
         output['entity_id'].append(item['entity_id'])
         for attr in attrs:
@@ -44,9 +44,10 @@ def main(password, askpass, attrs, address, port):
 def print_table(data, columns):
     """ format and print a table of data from a dictionary """
     # get column lengths
-    lengths = {}
-    for key, value in data.items():
-        lengths[key] = max([len(str(val)) for val in value] + [len(key)])
+    lengths = {
+        key: max([len(str(val)) for val in value] + [len(key)])
+        for key, value in data.items()
+    }
 
     # print header
     for item in columns:
@@ -65,13 +66,10 @@ def print_table(data, columns):
 def mk_url(address, port, password):
     """ construct the url call for the api states page """
     url = ''
-    if address.startswith('http://'):
-        url += address
-    else:
-        url += 'http://' + address
-    url += ':' + port + '/api/states?'
+    url += address if address.startswith('http://') else f'http://{address}'
+    url += f':{port}/api/states?'
     if password is not None:
-        url += 'api_password=' + password
+        url += f'api_password={password}'
     return url
 
 

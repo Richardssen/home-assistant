@@ -72,15 +72,15 @@ class TimeDateSensor(Entity):
         beat = ((int(seconds) + (int(minutes) * 60) + ((int(hours) + 1) *
                                                        3600)) / 86.4)
 
-        if self.type == 'time':
-            self._state = time
+        if self.type == 'beat':
+            self._state = '{0:.2f}'.format(beat)
         elif self.type == 'date':
             self._state = date
         elif self.type == 'date_time':
-            self._state = date + ', ' + time
+            self._state = f'{date}, {time}'
+        elif self.type == 'time':
+            self._state = time
         elif self.type == 'time_date':
-            self._state = time + ', ' + date
+            self._state = f'{time}, {date}'
         elif self.type == 'time_utc':
             self._state = time_utc
-        elif self.type == 'beat':
-            self._state = '{0:.2f}'.format(beat)

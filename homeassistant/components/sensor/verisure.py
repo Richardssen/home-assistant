@@ -23,14 +23,14 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         _LOGGER.error('A connection has not been made to Verisure mypages.')
         return False
 
-    sensors = []
-
-    sensors.extend([
+    sensors = [
         VerisureThermometer(value)
         for value in verisure.get_climate_status().values()
-        if verisure.SHOW_THERMOMETERS and
-        hasattr(value, 'temperature') and value.temperature
-        ])
+        if verisure.SHOW_THERMOMETERS
+        and hasattr(value, 'temperature')
+        and value.temperature
+    ]
+
 
     sensors.extend([
         VerisureHygrometer(value)
@@ -52,9 +52,7 @@ class VerisureThermometer(Entity):
     @property
     def name(self):
         """ Returns the name of the device. """
-        return '{} {}'.format(
-            verisure.STATUS[self._device][self._id].location,
-            "Temperature")
+        return f'{verisure.STATUS[self._device][self._id].location} Temperature'
 
     @property
     def state(self):
@@ -82,9 +80,7 @@ class VerisureHygrometer(Entity):
     @property
     def name(self):
         """ Returns the name of the device. """
-        return '{} {}'.format(
-            verisure.STATUS[self._device][self._id].location,
-            "Humidity")
+        return f'{verisure.STATUS[self._device][self._id].location} Humidity'
 
     @property
     def state(self):

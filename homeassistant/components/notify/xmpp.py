@@ -20,14 +20,17 @@ _LOGGER = logging.getLogger(__name__)
 def get_service(hass, config):
     """ Get the Jabber (XMPP) notification service. """
 
-    if not validate_config({DOMAIN: config},
-                           {DOMAIN: ['sender', 'password', 'recipient']},
-                           _LOGGER):
-        return None
-
-    return XmppNotificationService(config['sender'],
-                                   config['password'],
-                                   config['recipient'])
+    return (
+        XmppNotificationService(
+            config['sender'], config['password'], config['recipient']
+        )
+        if validate_config(
+            {DOMAIN: config},
+            {DOMAIN: ['sender', 'password', 'recipient']},
+            _LOGGER,
+        )
+        else None
+    )
 
 
 # pylint: disable=too-few-public-methods
@@ -43,10 +46,11 @@ class XmppNotificationService(BaseNotificationService):
         """ Send a message to a user. """
 
         title = kwargs.get(ATTR_TITLE)
-        data = "{}: {}".format(title, message) if title else message
+        data = f"{title}: {message}" if title else message
 
-        send_message(self._sender + '/home-assistant', self._password,
-                     self._recipient, data)
+        send_message(
+            f'{self._sender}/home-assistant', self._password, self._recipient, data
+        )
 
 
 def send_message(sender, password, recipient, message):

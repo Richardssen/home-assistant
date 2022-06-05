@@ -72,9 +72,7 @@ class RoundThermostat(ThermostatDevice):
     @property
     def target_temperature(self):
         """ Returns the temperature we try to reach. """
-        if self._is_dhw:
-            return None
-        return self._target_temperature
+        return None if self._is_dhw else self._target_temperature
 
     def set_temperature(self, temperature):
         """ Set new target temperature """

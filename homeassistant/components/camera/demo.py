@@ -26,8 +26,10 @@ class DemoCamera(Camera):
         """ Return a faked still image response. """
         now = dt_util.utcnow()
 
-        image_path = os.path.join(os.path.dirname(__file__),
-                                  'demo_{}.jpg'.format(now.second % 4))
+        image_path = os.path.join(
+            os.path.dirname(__file__), f'demo_{now.second % 4}.jpg'
+        )
+
         with open(image_path, 'rb') as file:
             return file.read()
 

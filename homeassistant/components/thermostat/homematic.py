@@ -37,7 +37,9 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         for name, device_cfg in config[CONF_DEVICES].items():
             # get device description to detect the type
             device_type = homegear.getDeviceDescription(
-                device_cfg[CONF_ID] + ':-1')['TYPE']
+                f'{device_cfg[CONF_ID]}:-1'
+            )['TYPE']
+
 
             if device_type in ['HM-CC-RT-DN', 'HM-CC-RT-DN-BoM']:
                 devices.append(HomematicThermostat(homegear,
@@ -48,9 +50,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                                                    device_cfg[CONF_ID],
                                                    name, 2))
             else:
-                raise ValueError(
-                    "Device Type '{}' currently not supported".format(
-                        device_type))
+                raise ValueError(f"Device Type '{device_type}' currently not supported")
     except socket.error:
         _LOGGER.exception("Connection error to homematic web service")
         return False
@@ -69,7 +69,7 @@ class HomematicThermostat(ThermostatDevice):
         self._id = _id
         self._channel = channel
         self._name = name
-        self._full_device_name = '{}:{}'.format(self._id, self._channel)
+        self._full_device_name = f'{self._id}:{self._channel}'
 
         self._current_temperature = None
         self._target_temperature = None

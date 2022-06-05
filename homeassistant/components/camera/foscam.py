@@ -36,7 +36,7 @@ class FoscamCamera(Camera):
         ip_address = device_info.get('ip')
         port = device_info.get('port', 88)
 
-        self._base_url = 'http://' + ip_address + ':' + str(port) + '/'
+        self._base_url = f'http://{ip_address}:{str(port)}/'
         self._username = device_info.get('username')
         self._password = device_info.get('password')
         self._snap_picture_url = self._base_url \

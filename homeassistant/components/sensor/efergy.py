@@ -59,7 +59,7 @@ class EfergySensor(Entity):
         self.period = period
         self.currency = currency
         if self.type == 'cost':
-            self._unit_of_measurement = self.currency + '/' + self.period
+            self._unit_of_measurement = f'{self.currency}/{self.period}'
         else:
             self._unit_of_measurement = SENSOR_TYPES[sensor_type][1]
 
@@ -82,17 +82,22 @@ class EfergySensor(Entity):
         """ Gets the Efergy monitor data from the web service. """
         try:
             if self.type == 'instant_readings':
-                url_string = _RESOURCE + 'getInstant?token=' + self.app_token
+                url_string = f'{_RESOURCE}getInstant?token={self.app_token}'
                 response = get(url_string)
                 self._state = response.json()['reading'] / 1000
             elif self.type == 'budget':
-                url_string = _RESOURCE + 'getBudget?token=' + self.app_token
+                url_string = f'{_RESOURCE}getBudget?token={self.app_token}'
                 response = get(url_string)
                 self._state = response.json()['status']
             elif self.type == 'cost':
-                url_string = _RESOURCE + 'getCost?token=' + self.app_token \
-                    + '&offset=' + self.utc_offset + '&period=' \
-                    + self.period
+                url_string = (
+                    (
+                        (f'{_RESOURCE}getCost?token={self.app_token}' + '&offset=')
+                        + self.utc_offset
+                    )
+                    + '&period='
+                ) + self.period
+
                 response = get(url_string)
                 self._state = response.json()['sum']
             else:

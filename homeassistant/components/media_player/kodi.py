@@ -84,10 +84,7 @@ class KodiDevice(MediaPlayerDevice):
         if len(self._players) == 0:
             return STATE_IDLE
 
-        if self._properties['speed'] == 0:
-            return STATE_PAUSED
-        else:
-            return STATE_PLAYING
+        return STATE_PAUSED if self._properties['speed'] == 0 else STATE_PLAYING
 
     def update(self):
         """ Retrieve latest state. """
@@ -245,9 +242,8 @@ class KodiDevice(MediaPlayerDevice):
         """ Send seek command. """
         players = self._get_players()
 
-        time = {}
+        time = {'milliseconds': int((position % 1) * 1000)}
 
-        time['milliseconds'] = int((position % 1) * 1000)
         position = int(position)
 
         time['seconds'] = int(position % 60)
@@ -256,7 +252,7 @@ class KodiDevice(MediaPlayerDevice):
         time['minutes'] = int(position % 60)
         position /= 60
 
-        time['hours'] = int(position)
+        time['hours'] = position
 
         if len(players) != 0:
             self._server.Player.Seek(players[0]['playerid'], time)

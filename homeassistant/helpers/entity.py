@@ -39,7 +39,7 @@ class Entity(object):
     @property
     def unique_id(self):
         """ Returns a unique id. """
-        return "{}.{}".format(self.__class__, id(self))
+        return f"{self.__class__}.{id(self)}"
 
     @property
     def name(self):
@@ -89,11 +89,10 @@ class Entity(object):
         If force_refresh == True will update entity before setting state.
         """
         if self.hass is None:
-            raise RuntimeError("Attribute hass is None for {}".format(self))
+            raise RuntimeError(f"Attribute hass is None for {self}")
 
         if self.entity_id is None:
-            raise NoEntitySpecifiedError(
-                "No entity id specified for entity {}".format(self.name))
+            raise NoEntitySpecifiedError(f"No entity id specified for entity {self.name}")
 
         if force_refresh:
             self.update()
@@ -136,7 +135,7 @@ class Entity(object):
                 other.unique_id == self.unique_id)
 
     def __repr__(self):
-        return "<Entity {}: {}>".format(self.name, self.state)
+        return f"<Entity {self.name}: {self.state}>"
 
     @staticmethod
     def overwrite_attribute(entity_id, attrs, vals):

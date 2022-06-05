@@ -64,11 +64,10 @@ def prepare(hass):
             if fil == '__pycache__':
                 continue
             elif os.path.isdir(os.path.join(custom_path, fil)):
-                AVAILABLE_COMPONENTS.append('custom_components.{}'.format(fil))
+                AVAILABLE_COMPONENTS.append(f'custom_components.{fil}')
             else:
                 # For files we will strip out .py extension
-                AVAILABLE_COMPONENTS.append(
-                    'custom_components.{}'.format(fil[0:-3]))
+                AVAILABLE_COMPONENTS.append(f'custom_components.{fil[:-3]}')
 
     PREPARED = True
 
@@ -99,8 +98,11 @@ def get_component(comp_name):
     # information to track down when debugging Home Assistant.
 
     # First check custom, then built-in
-    potential_paths = ['custom_components.{}'.format(comp_name),
-                       'homeassistant.components.{}'.format(comp_name)]
+    potential_paths = [
+        f'custom_components.{comp_name}',
+        f'homeassistant.components.{comp_name}',
+    ]
+
 
     for path in potential_paths:
         # Validate here that root component exists
@@ -134,7 +136,7 @@ def get_component(comp_name):
         except ImportError as err:
             # This error happens if for example custom_components/switch
             # exists and we try to load switch.demo.
-            if str(err) != "No module named '{}'".format(path):
+            if str(err) != f"No module named '{path}'":
                 _LOGGER.exception(
                     ("Error loading %s. Make sure all "
                      "dependencies are installed"), path)

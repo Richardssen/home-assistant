@@ -150,7 +150,7 @@ class TestUtil(unittest.TestCase):
 
         self.assertEqual(set1, util.OrderedSet([2, 3]))
         self.assertNotEqual(set1, util.OrderedSet([3, 2]))
-        self.assertEqual(set1, set([2, 3]))
+        self.assertEqual(set1, {2, 3})
         self.assertEqual(set1, {3, 2})
         self.assertEqual(set1, [2, 3])
         self.assertEqual(set1, [3, 2])

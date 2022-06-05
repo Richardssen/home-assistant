@@ -69,8 +69,7 @@ class HeatControl(ThermostatDevice):
 
         track_state_change(hass, sensor_entity_id, self._sensor_changed)
 
-        sensor_state = hass.states.get(sensor_entity_id)
-        if sensor_state:
+        if sensor_state := hass.states.get(sensor_entity_id):
             self._update_temp(sensor_state)
 
     @property
@@ -112,11 +111,7 @@ class HeatControl(ThermostatDevice):
     def min_temp(self):
         """ Return minimum temperature. """
         # pylint: disable=no-member
-        if self._min_temp:
-            return self._min_temp
-        else:
-            # get default temp from super class
-            return ThermostatDevice.min_temp.fget(self)
+        return self._min_temp or ThermostatDevice.min_temp.fget(self)
 
     @property
     def max_temp(self):

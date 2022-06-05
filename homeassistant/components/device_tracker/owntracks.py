@@ -37,10 +37,11 @@ def setup_scanner(hass, config, see):
 
         parts = topic.split('/')
         kwargs = {
-            'dev_id': '{}_{}'.format(parts[1], parts[2]),
+            'dev_id': f'{parts[1]}_{parts[2]}',
             'host_name': parts[1],
             'gps': (data['lat'], data['lon']),
         }
+
         if 'acc' in data:
             kwargs['gps_accuracy'] = data['acc']
         if 'batt' in data:

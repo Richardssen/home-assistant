@@ -65,7 +65,7 @@ def setup(hass, config):
         _LOGGER.error('isy994 host value in configuration file is invalid.')
         return False
     port = host.port
-    addr = addr.replace(':{}'.format(port), '')
+    addr = addr.replace(f':{port}', '')
 
     # pull and parse optional configuration
     global SENSOR_STRING

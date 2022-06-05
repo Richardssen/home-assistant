@@ -173,14 +173,7 @@ def setup(hass, config):
                     light.update_ha_state(True)
             return
 
-        # Processing extra data for turn light on request
-
-        # We process the profile first so that we get the desired
-        # behavior that extra service data attributes overwrite
-        # profile values
-        profile = profiles.get(dat.get(ATTR_PROFILE))
-
-        if profile:
+        if profile := profiles.get(dat.get(ATTR_PROFILE)):
             *params[ATTR_XY_COLOR], params[ATTR_BRIGHTNESS] = profile
 
         if ATTR_BRIGHTNESS in dat:
@@ -286,8 +279,7 @@ class Light(ToggleEntity):
 
         if self.is_on:
             for prop, attr in PROP_TO_ATTR.items():
-                value = getattr(self, prop)
-                if value:
+                if value := getattr(self, prop):
                     data[attr] = value
 
             if ATTR_RGB_COLOR not in data and ATTR_XY_COLOR in data and \
@@ -299,6 +291,6 @@ class Light(ToggleEntity):
         device_attr = self.device_state_attributes
 
         if device_attr is not None:
-            data.update(device_attr)
+            data |= device_attr
 
         return data

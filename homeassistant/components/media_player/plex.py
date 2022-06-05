@@ -201,8 +201,7 @@ class PlexClient(MediaPlayerDevice):
     @property
     def unique_id(self):
         """ Returns the id of this plex client """
-        return "{}.{}".format(
-            self.__class__, self.device.machineIdentifier or self.device.name)
+        return f"{self.__class__}.{self.device.machineIdentifier or self.device.name}"
 
     @property
     def name(self):

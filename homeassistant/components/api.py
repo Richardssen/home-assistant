@@ -201,9 +201,7 @@ def _handle_get_api_states_entity(handler, path_match, data):
     """ Returns the state of a specific entity. """
     entity_id = path_match.group('entity_id')
 
-    state = handler.server.hass.states.get(entity_id)
-
-    if state:
+    if state := handler.server.hass.states.get(entity_id):
         handler.write_json(state)
     else:
         handler.write_json_message("State does not exist.", HTTP_NOT_FOUND)
@@ -265,14 +263,12 @@ def _handle_api_post_events_event(handler, path_match, event_data):
     # We will try to convert state dicts back to State objects
     if event_type == ha.EVENT_STATE_CHANGED and event_data:
         for key in ('old_state', 'new_state'):
-            state = ha.State.from_dict(event_data.get(key))
-
-            if state:
+            if state := ha.State.from_dict(event_data.get(key)):
                 event_data[key] = state
 
     handler.server.hass.bus.fire(event_type, event_data, event_origin)
 
-    handler.write_json_message("Event {} fired.".format(event_type))
+    handler.write_json_message(f"Event {event_type} fired.")
 
 
 def _handle_get_api_services(handler, path_match, data):

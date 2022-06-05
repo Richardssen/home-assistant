@@ -29,18 +29,14 @@ _GROUP_TYPES = [(STATE_ON, STATE_OFF), (STATE_HOME, STATE_NOT_HOME),
 
 def _get_group_on_off(state):
     """ Determine the group on/off states based on a state. """
-    for states in _GROUP_TYPES:
-        if state in states:
-            return states
-
-    return None, None
+    return next(
+        (states for states in _GROUP_TYPES if state in states), (None, None)
+    )
 
 
 def is_on(hass, entity_id):
     """ Returns if the group state is in its ON-state. """
-    state = hass.states.get(entity_id)
-
-    if state:
+    if state := hass.states.get(entity_id):
         group_on, _ = _get_group_on_off(state.state)
 
         # If we found a group_type, compare to ON-state
@@ -70,9 +66,8 @@ def expand_entity_ids(hass, entity_ids):
                     in get_entity_ids(hass, entity_id)
                     if ent_id not in found_ids)
 
-            else:
-                if entity_id not in found_ids:
-                    found_ids.append(entity_id)
+            elif entity_id not in found_ids:
+                found_ids.append(entity_id)
 
         except AttributeError:
             # Raised by util.split_entity_id if entity_id is not a string

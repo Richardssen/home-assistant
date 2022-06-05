@@ -63,7 +63,7 @@ class UbusDeviceScanner(object):
         self.parse_api_pattern = re.compile(r"(?P<param>\w*) = (?P<value>.*);")
         self.lock = threading.Lock()
         self.last_results = {}
-        self.url = 'http://{}/ubus'.format(host)
+        self.url = f'http://{host}/ubus'
 
         self.session_id = _get_session_id(self.url, username, password)
         self.hostapd = []
@@ -85,28 +85,39 @@ class UbusDeviceScanner(object):
 
         with self.lock:
             if self.leasefile is None:
-                result = _req_json_rpc(self.url, self.session_id,
-                                       'call', 'uci', 'get',
-                                       config="dhcp", type="dnsmasq")
-                if result:
-                    values = result["values"].values()
-                    self.leasefile = next(iter(values))["leasefile"]
-                else:
+                if not (
+                    result := _req_json_rpc(
+                        self.url,
+                        self.session_id,
+                        'call',
+                        'uci',
+                        'get',
+                        config="dhcp",
+                        type="dnsmasq",
+                    )
+                ):
                     return
 
+                values = result["values"].values()
+                self.leasefile = next(iter(values))["leasefile"]
             if self.mac2name is None:
-                result = _req_json_rpc(self.url, self.session_id,
-                                       'call', 'file', 'read',
-                                       path=self.leasefile)
-                if result:
-                    self.mac2name = dict()
-                    for line in result["data"].splitlines():
-                        hosts = line.split(" ")
-                        self.mac2name[hosts[1].upper()] = hosts[3]
-                else:
+                if not (
+                    result := _req_json_rpc(
+                        self.url,
+                        self.session_id,
+                        'call',
+                        'file',
+                        'read',
+                        path=self.leasefile,
+                    )
+                ):
                     # Error, handled in the _req_json_rpc
                     return
 
+                self.mac2name = {}
+                for line in result["data"].splitlines():
+                    hosts = line.split(" ")
+                    self.mac2name[hosts[1].upper()] = hosts[3]
             return self.mac2name.get(device.upper(), None)
 
     @Throttle(MIN_TIME_BETWEEN_SCANS)
@@ -129,10 +140,9 @@ class UbusDeviceScanner(object):
             self.last_results = []
             results = 0
             for hostapd in self.hostapd:
-                result = _req_json_rpc(self.url, self.session_id,
-                                       'call', hostapd, 'get_clients')
-
-                if result:
+                if result := _req_json_rpc(
+                    self.url, self.session_id, 'call', hostapd, 'get_clients'
+                ):
                     results = results + 1
                     self.last_results.extend(result['clients'].keys())
 
@@ -159,10 +169,7 @@ def _req_json_rpc(url, session_id, rpcmethod, subsystem, method, **params):
     if res.status_code == 200:
         response = res.json()
 
-        if rpcmethod == "call":
-            return response["result"][1]
-        else:
-            return response["result"]
+        return response["result"][1] if rpcmethod == "call" else response["result"]
 
 
 def _get_session_id(url, username, password):

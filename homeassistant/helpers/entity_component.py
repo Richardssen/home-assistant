@@ -116,8 +116,10 @@ class EntityComponent(object):
         with self.lock:
             # We copy the entities because new entities might be detected
             # during state update causing deadlocks.
-            entities = list(entity for entity in self.entities.values()
-                            if entity.should_poll)
+            entities = [
+                entity for entity in self.entities.values() if entity.should_poll
+            ]
+
 
         self.logger.info("Updating %s entities", self.domain)
 
@@ -148,5 +150,5 @@ class EntityComponent(object):
                 'Error while setting up platform %s', platform_type)
             return
 
-        platform_name = '{}.{}'.format(self.domain, platform_type)
+        platform_name = f'{self.domain}.{platform_type}'
         self.hass.config.components.append(platform_name)

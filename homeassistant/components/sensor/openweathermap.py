@@ -93,7 +93,7 @@ class OpenWeatherMapSensor(Entity):
 
     @property
     def name(self):
-        return '{} {}'.format(self.client_name, self._name)
+        return f'{self.client_name} {self._name}'
 
     @property
     def state(self):

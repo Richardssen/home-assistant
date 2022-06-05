@@ -211,12 +211,10 @@ class Event(object):
     def __repr__(self):
         # pylint: disable=maybe-no-member
         if self.data:
-            return "<Event {}[{}]: {}>".format(
-                self.event_type, str(self.origin)[0],
-                util.repr_helper(self.data))
+            return f"<Event {self.event_type}[{str(self.origin)[0]}]: {util.repr_helper(self.data)}>"
+
         else:
-            return "<Event {}[{}]>".format(self.event_type,
-                                           str(self.origin)[0])
+            return f"<Event {self.event_type}[{str(self.origin)[0]}]>"
 
     def __eq__(self, other):
         return (self.__class__ == other.__class__ and
@@ -344,9 +342,10 @@ class State(object):
     def __init__(self, entity_id, state, attributes=None, last_changed=None,
                  last_updated=None):
         if not ENTITY_ID_PATTERN.match(entity_id):
-            raise InvalidEntityFormatError((
-                "Invalid entity id encountered: {}. "
-                "Format should be <domain>.<object_id>").format(entity_id))
+            raise InvalidEntityFormatError(
+                f"Invalid entity id encountered: {entity_id}. Format should be <domain>.<object_id>"
+            )
+
 
         self.entity_id = entity_id.lower()
         self.state = state
@@ -424,12 +423,9 @@ class State(object):
                 self.attributes == other.attributes)
 
     def __repr__(self):
-        attr = "; {}".format(util.repr_helper(self.attributes)) \
-               if self.attributes else ""
+        attr = f"; {util.repr_helper(self.attributes)}" if self.attributes else ""
 
-        return "<state {}={}{} @ {}>".format(
-            self.entity_id, self.state, attr,
-            dt_util.datetime_to_local_str(self.last_changed))
+        return f"<state {self.entity_id}={self.state}{attr} @ {dt_util.datetime_to_local_str(self.last_changed)}>"
 
 
 class StateMachine(object):
@@ -560,10 +556,10 @@ class ServiceCall(object):
 
     def __repr__(self):
         if self.data:
-            return "<ServiceCall {}.{}: {}>".format(
-                self.domain, self.service, util.repr_helper(self.data))
+            return f"<ServiceCall {self.domain}.{self.service}: {util.repr_helper(self.data)}>"
+
         else:
-            return "<ServiceCall {}.{}>".format(self.domain, self.service)
+            return f"<ServiceCall {self.domain}.{self.service}>"
 
 
 class ServiceRegistry(object):
@@ -682,7 +678,7 @@ class ServiceRegistry(object):
     def _generate_unique_id(self):
         """ Generates a unique service call id. """
         self._cur_id += 1
-        return "{}-{}".format(id(self), self._cur_id)
+        return f"{id(self)}-{self._cur_id}"
 
 
 class Config(object):

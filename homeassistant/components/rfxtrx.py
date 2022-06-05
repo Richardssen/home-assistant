@@ -39,7 +39,7 @@ def setup(hass, config):
         # Log RFXCOM event
         entity_id = slugify(event.device.id_string.lower())
         packet_id = "".join("{0:02x}".format(x) for x in event.data)
-        entity_name = "%s : %s" % (entity_id, packet_id)
+        entity_name = f"{entity_id} : {packet_id}"
         _LOGGER.info("Receive RFXCOM event from %s => %s",
                      event.device, entity_name)
 
@@ -85,12 +85,10 @@ def get_rfx_object(packetid):
     pkt = rfxtrxmod.lowlevel.parse(binarypacket)
     if pkt is not None:
         if isinstance(pkt, rfxtrxmod.lowlevel.SensorPacket):
-            obj = rfxtrxmod.SensorEvent(pkt)
+            return rfxtrxmod.SensorEvent(pkt)
         elif isinstance(pkt, rfxtrxmod.lowlevel.Status):
-            obj = rfxtrxmod.StatusEvent(pkt)
+            return rfxtrxmod.StatusEvent(pkt)
         else:
-            obj = rfxtrxmod.ControlEvent(pkt)
-
-        return obj
+            return rfxtrxmod.ControlEvent(pkt)
 
     return None

@@ -60,7 +60,7 @@ class LogitechMediaServer(object):
         self._username = username
         self._password = password
         self.http_port = self._get_http_port()
-        self.init_success = True if self.http_port else False
+        self.init_success = bool(self.http_port)
 
     def _get_http_port(self):
         """ Get http port from media server, it is used to get cover art. """
@@ -86,7 +86,7 @@ class LogitechMediaServer(object):
         """ Create a list of SqueezeBoxDevices connected to the LMS. """
         players = []
         count = self.query('player', 'count', '?')
-        for index in range(0, int(count)):
+        for index in range(int(count)):
             player_id = self.query('player', 'id', str(index), '?')
             player = SqueezeBoxDevice(self, player_id)
             players.append(player)

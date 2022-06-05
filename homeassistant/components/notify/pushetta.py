@@ -59,5 +59,4 @@ class PushettaNotificationService(BaseNotificationService):
 
         title = kwargs.get(ATTR_TITLE)
 
-        self.pushetta.pushMessage(self._channel_name,
-                                  "{} {}".format(title, message))
+        self.pushetta.pushMessage(self._channel_name, f"{title} {message}")

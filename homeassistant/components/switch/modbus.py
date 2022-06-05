@@ -22,24 +22,21 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     if modbus.TYPE == "serial" and not slave:
         _LOGGER.error("No slave number provided for serial Modbus")
         return False
-    registers = config.get("registers")
-    if registers:
+    if registers := config.get("registers"):
         for regnum, register in registers.items():
             bits = register.get("bits")
-            for bitnum, bit in bits.items():
-                if bit.get("name"):
-                    switches.append(ModbusSwitch(bit.get("name"),
-                                                 slave,
-                                                 regnum,
-                                                 bitnum))
-    coils = config.get("coils")
-    if coils:
-        for coilnum, coil in coils.items():
-            switches.append(ModbusSwitch(coil.get("name"),
-                                         slave,
-                                         coilnum,
-                                         0,
-                                         coil=True))
+            switches.extend(
+                ModbusSwitch(bit.get("name"), slave, regnum, bitnum)
+                for bitnum, bit in bits.items()
+                if bit.get("name")
+            )
+
+    if coils := config.get("coils"):
+        switches.extend(
+            ModbusSwitch(coil.get("name"), slave, coilnum, 0, coil=True)
+            for coilnum, coil in coils.items()
+        )
+
     add_devices(switches)
 
 
@@ -57,7 +54,7 @@ class ModbusSwitch(ToggleEntity):
         self.register_value = None
 
     def __str__(self):
-        return "%s: %s" % (self.name, self.state)
+        return f"{self.name}: {self.state}"
 
     @property
     def should_poll(self):
@@ -70,9 +67,7 @@ class ModbusSwitch(ToggleEntity):
     @property
     def unique_id(self):
         """ Returns a unique id. """
-        return "MODBUS-SWITCH-{}-{}-{}".format(self.slave,
-                                               self.register,
-                                               self.bit)
+        return f"MODBUS-SWITCH-{self.slave}-{self.register}-{self.bit}"
 
     @property
     def is_on(self):
@@ -120,8 +115,6 @@ class ModbusSwitch(ToggleEntity):
             result = modbus.NETWORK.read_holding_registers(
                 unit=self.slave, address=self.register,
                 count=1)
-            val = 0
-            for i, res in enumerate(result.registers):
-                val += res * (2**(i*16))
+            val = sum(res * (2**(i*16)) for i, res in enumerate(result.registers))
             self.register_value = val
             self._is_on = (val & (0x0001 << self.bit) > 0)

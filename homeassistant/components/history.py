@@ -50,8 +50,8 @@ def state_changes_during_period(start_time, end_time=None, entity_id=None):
         where += "AND entity_id = ? "
         data.append(entity_id.lower())
 
-    query = ("SELECT * FROM states WHERE {} "
-             "ORDER BY entity_id, last_changed ASC").format(where)
+    query = f"SELECT * FROM states WHERE {where} ORDER BY entity_id, last_changed ASC"
+
 
     states = recorder.query_states(query, data)
 
@@ -76,16 +76,15 @@ def get_states(utc_point_in_time, entity_ids=None, run=None):
     if run is None:
         run = recorder.run_information(utc_point_in_time)
 
-        # History did not run before utc_point_in_time
-        if run is None:
-            return []
+    # History did not run before utc_point_in_time
+    if run is None:
+        return []
 
-    where = run.where_after_start_run + "AND created < ? "
+    where = f"{run.where_after_start_run}AND created < ? "
     where_data = [utc_point_in_time]
 
     if entity_ids is not None:
-        where += "AND entity_id IN ({}) ".format(
-            ",".join(['?'] * len(entity_ids)))
+        where += f"""AND entity_id IN ({",".join(['?'] * len(entity_ids))}) """
         where_data.extend(entity_ids)
 
     query = """

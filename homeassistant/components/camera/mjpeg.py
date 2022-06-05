@@ -52,8 +52,7 @@ class MjpegCamera(Camera):
                 jpg_start = data.find(b'\xff\xd8')
                 jpg_end = data.find(b'\xff\xd9')
                 if jpg_start != -1 and jpg_end != -1:
-                    jpg = data[jpg_start:jpg_end + 2]
-                    return jpg
+                    return data[jpg_start:jpg_end + 2]
 
         if self._username and self._password:
             with closing(requests.get(self._mjpeg_url,

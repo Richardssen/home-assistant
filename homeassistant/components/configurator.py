@@ -115,18 +115,15 @@ class Configurator(object):
 
         self._requests[request_id] = (entity_id, fields, callback)
 
-        data = {
-            ATTR_CONFIGURE_ID: request_id,
-            ATTR_FIELDS: fields,
-        }
-
-        data.update({
-            key: value for key, value in [
+        data = {ATTR_CONFIGURE_ID: request_id, ATTR_FIELDS: fields,} | {
+            key: value
+            for key, value in [
                 (ATTR_DESCRIPTION, description),
                 (ATTR_DESCRIPTION_IMAGE, description_image),
                 (ATTR_SUBMIT_CAPTION, submit_caption),
-            ] if value is not None
-        })
+            ]
+            if value is not None
+        }
 
         self.hass.states.set(entity_id, STATE_CONFIGURE, data)
 
@@ -182,7 +179,7 @@ class Configurator(object):
     def _generate_unique_id(self):
         """ Generates a unique configurator id. """
         self._cur_id += 1
-        return "{}-{}".format(id(self), self._cur_id)
+        return f"{id(self)}-{self._cur_id}"
 
     def _validate_request_id(self, request_id):
         """ Validate that the request belongs to this instance. """

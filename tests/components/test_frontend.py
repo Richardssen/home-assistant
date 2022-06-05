@@ -4,6 +4,7 @@ tests.test_component_http
 
 Tests Home Assistant HTTP component does what it should do.
 """
+
 # pylint: disable=protected-access,too-many-public-methods
 import re
 import unittest
@@ -23,7 +24,7 @@ API_PASSWORD = "test1234"
 # out what is going on, let's run this test on a different port.
 SERVER_PORT = 8121
 
-HTTP_BASE_URL = "http://127.0.0.1:{}".format(SERVER_PORT)
+HTTP_BASE_URL = f"http://127.0.0.1:{SERVER_PORT}"
 
 HA_HEADERS = {HTTP_HEADER_HA_AUTH: API_PASSWORD}
 
@@ -82,12 +83,11 @@ class TestFrontend(unittest.TestCase):
         self.assertEqual(200, req.status_code)
 
     def test_auto_filling_in_api_password(self):
-        req = requests.get(
-            _url("?{}={}".format(http.DATA_API_PASSWORD, API_PASSWORD)))
+        req = requests.get(_url(f"?{http.DATA_API_PASSWORD}={API_PASSWORD}"))
 
         self.assertEqual(200, req.status_code)
 
-        auth_text = re.search(r"auth='{}'".format(API_PASSWORD), req.text)
+        auth_text = re.search(f"auth='{API_PASSWORD}'", req.text)
 
         self.assertIsNotNone(auth_text)
 

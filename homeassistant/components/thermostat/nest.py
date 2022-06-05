@@ -65,11 +65,10 @@ class NestThermostat(ThermostatDevice):
         name = self.device.name
         if location is None:
             return name
+        if name == '':
+            return location.capitalize()
         else:
-            if name == '':
-                return location.capitalize()
-            else:
-                return location.capitalize() + '(' + name + ')'
+            return f'{location.capitalize()}({name})'
 
     @property
     def unit_of_measurement(self):
@@ -115,10 +114,7 @@ class NestThermostat(ThermostatDevice):
                 temp = low
             else:
                 range_average = (low + high)/2
-                if self.current_temperature < range_average:
-                    temp = low
-                elif self.current_temperature >= range_average:
-                    temp = high
+                temp = low if self.current_temperature < range_average else high
         else:
             temp = target
 
@@ -164,19 +160,13 @@ class NestThermostat(ThermostatDevice):
     def min_temp(self):
         """ Identifies min_temp in Nest API or defaults if not available. """
         temp = self.device.away_temperature.low
-        if temp is None:
-            return super().min_temp
-        else:
-            return temp
+        return super().min_temp if temp is None else temp
 
     @property
     def max_temp(self):
         """ Identifies mxn_temp in Nest API or defaults if not available. """
         temp = self.device.away_temperature.high
-        if temp is None:
-            return super().max_temp
-        else:
-            return temp
+        return super().max_temp if temp is None else temp
 
     def update(self):
         """ Python-nest has its own mechanism for staying up to date. """

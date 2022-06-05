@@ -96,7 +96,7 @@ class TestAlarmControlPanelManual(unittest.TestCase):
         self.assertEqual(STATE_ALARM_DISARMED,
                          self.hass.states.get(entity_id).state)
 
-        alarm_control_panel.alarm_arm_home(self.hass, CODE + '2')
+        alarm_control_panel.alarm_arm_home(self.hass, f'{CODE}2')
         self.hass.pool.block_till_done()
 
         self.assertEqual(STATE_ALARM_DISARMED,
@@ -168,7 +168,7 @@ class TestAlarmControlPanelManual(unittest.TestCase):
         self.assertEqual(STATE_ALARM_DISARMED,
                          self.hass.states.get(entity_id).state)
 
-        alarm_control_panel.alarm_arm_away(self.hass, CODE + '2')
+        alarm_control_panel.alarm_arm_away(self.hass, f'{CODE}2')
         self.hass.pool.block_till_done()
 
         self.assertEqual(STATE_ALARM_DISARMED,
@@ -268,13 +268,20 @@ class TestAlarmControlPanelManual(unittest.TestCase):
                          self.hass.states.get(entity_id).state)
 
     def test_disarm_during_trigger_with_invalid_code(self):
-        self.assertTrue(alarm_control_panel.setup(self.hass, {
-            'alarm_control_panel': {
-                'platform': 'manual',
-                'name': 'test',
-                'pending_time': 5,
-                'code': CODE + '2'
-            }}))
+        self.assertTrue(
+            alarm_control_panel.setup(
+                self.hass,
+                {
+                    'alarm_control_panel': {
+                        'platform': 'manual',
+                        'name': 'test',
+                        'pending_time': 5,
+                        'code': f'{CODE}2',
+                    }
+                },
+            )
+        )
+
 
         entity_id = 'alarm_control_panel.test'
 

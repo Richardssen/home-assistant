@@ -49,15 +49,14 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     if discovery_info is None:
         return
     data = ecobee.NETWORK
-    dev = list()
+    dev = []
     for index in range(len(data.ecobee.thermostats)):
         for sensor in data.ecobee.get_remote_sensors(index):
-            for item in sensor['capability']:
-                if item['type'] not in ('temperature',
-                                        'humidity', 'occupancy'):
-                    continue
-
-                dev.append(EcobeeSensor(sensor['name'], item['type'], index))
+            dev.extend(
+                EcobeeSensor(sensor['name'], item['type'], index)
+                for item in sensor['capability']
+                if item['type'] in ('temperature', 'humidity', 'occupancy')
+            )
 
     add_devices(dev)
 
@@ -66,7 +65,7 @@ class EcobeeSensor(Entity):
     """ An ecobee sensor. """
 
     def __init__(self, sensor_name, sensor_type, sensor_index):
-        self._name = sensor_name + ' ' + SENSOR_TYPES[sensor_type][0]
+        self._name = f'{sensor_name} {SENSOR_TYPES[sensor_type][0]}'
         self.sensor_name = sensor_name
         self.type = sensor_type
         self.index = sensor_index
