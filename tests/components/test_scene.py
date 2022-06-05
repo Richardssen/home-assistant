@@ -40,7 +40,7 @@ class TestScene(unittest.TestCase):
             light.DOMAIN: {'platform': 'test'}
         }))
 
-        light_1, light_2 = test_light.DEVICES[0:2]
+        light_1, light_2 = test_light.DEVICES[:2]
 
         light.turn_off(self.hass, [light_1.entity_id, light_2.entity_id])
 

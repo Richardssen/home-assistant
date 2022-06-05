@@ -112,5 +112,5 @@ class RPiGPIOSwitch(ToggleEntity):
         data = {}
         device_attr = self.device_state_attributes
         if device_attr is not None:
-            data.update(device_attr)
+            data |= device_attr
         return data

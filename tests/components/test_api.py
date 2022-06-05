@@ -4,6 +4,7 @@ tests.test_component_http
 
 Tests Home Assistant HTTP component does what it should do.
 """
+
 # pylint: disable=protected-access,too-many-public-methods
 from contextlib import closing
 import json
@@ -24,7 +25,7 @@ API_PASSWORD = "test1234"
 # out what is going on, let's run this test on a different port.
 SERVER_PORT = 8120
 
-HTTP_BASE_URL = "http://127.0.0.1:{}".format(SERVER_PORT)
+HTTP_BASE_URL = f"http://127.0.0.1:{SERVER_PORT}"
 
 HA_HEADERS = {const.HTTP_HEADER_HA_AUTH: API_PASSWORD}
 
@@ -79,8 +80,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(401, req.status_code)
 
     def test_access_with_password_in_url(self):
-        req = requests.get(
-            "{}?api_password={}".format(_url(const.URL_API), API_PASSWORD))
+        req = requests.get(f"{_url(const.URL_API)}?api_password={API_PASSWORD}")
 
         self.assertEqual(200, req.status_code)
 

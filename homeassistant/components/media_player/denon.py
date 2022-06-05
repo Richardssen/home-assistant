@@ -139,7 +139,7 @@ class DenonDevice(MediaPlayerDevice):
     def set_volume_level(self, volume):
         """ set volume level, range 0..1. """
         # 60dB max
-        self.telnet_command("MV" + str(round(volume * 60)).zfill(2))
+        self.telnet_command(f"MV{str(round(volume * 60)).zfill(2)}")
 
     def mute_volume(self, mute):
         """ mute (true) or unmute (false) media player. """

@@ -74,8 +74,7 @@ class Hyperion(Light):
 
     def setup(self):
         """ Get the hostname of the remote. """
-        response = self.json_request({"command": "serverinfo"})
-        if response:
+        if response := self.json_request({"command": "serverinfo"}):
             self._name = response["info"]["hostname"]
             return True
 

@@ -134,13 +134,12 @@ class SwitchDevice(ToggleEntity):
         data = {}
 
         for prop, attr in PROP_TO_ATTR.items():
-            value = getattr(self, prop)
-            if value:
+            if value := getattr(self, prop):
                 data[attr] = value
 
         device_attr = self.device_state_attributes
 
         if device_attr is not None:
-            data.update(device_attr)
+            data |= device_attr
 
         return data

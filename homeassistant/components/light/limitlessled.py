@@ -227,9 +227,7 @@ class LimitlessLEDRGBWGroup(LimitlessLEDGroup):
                             color=_from_hass_color(self._color))
         # Flash.
         if ATTR_FLASH in kwargs:
-            duration = 0
-            if kwargs[ATTR_FLASH] == FLASH_LONG:
-                duration = 1
+            duration = 1 if kwargs[ATTR_FLASH] == FLASH_LONG else 0
             pipeline.flash(duration=duration)
         # Add effects.
         if ATTR_EFFECT in kwargs:
@@ -281,4 +279,4 @@ def _to_hass_color(color):
     """ Convert from Color tuple to
     Home Assistant RGB list.
     """
-    return list([int(c) for c in color])
+    return [int(c) for c in color]

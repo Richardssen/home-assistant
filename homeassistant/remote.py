@@ -56,9 +56,9 @@ class API(object):
         self.port = port or SERVER_PORT
         self.api_password = api_password
         if use_ssl:
-            self.base_url = "https://{}:{}".format(host, self.port)
+            self.base_url = f"https://{host}:{self.port}"
         else:
-            self.base_url = "http://{}:{}".format(host, self.port)
+            self.base_url = f"http://{host}:{self.port}"
         self.status = None
         self._headers = {}
 
@@ -92,13 +92,12 @@ class API(object):
             raise HomeAssistantError("Error connecting to server")
 
         except requests.exceptions.Timeout:
-            error = "Timeout when talking to {}".format(self.host)
+            error = f"Timeout when talking to {self.host}"
             _LOGGER.exception(error)
             raise HomeAssistantError(error)
 
     def __repr__(self):
-        return "API({}, {}, {})".format(
-            self.host, self.api_password, self.port)
+        return f"API({self.host}, {self.api_password}, {self.port})"
 
 
 class HomeAssistant(ha.HomeAssistant):
@@ -108,8 +107,9 @@ class HomeAssistant(ha.HomeAssistant):
     def __init__(self, remote_api, local_api=None):
         if not remote_api.validate_api():
             raise HomeAssistantError(
-                "Remote API at {}:{} not valid: {}".format(
-                    remote_api.host, remote_api.port, remote_api.status))
+                f"Remote API at {remote_api.host}:{remote_api.port} not valid: {remote_api.status}"
+            )
+
 
         self.remote_api = remote_api
 
@@ -124,10 +124,9 @@ class HomeAssistant(ha.HomeAssistant):
 
     def start(self):
         # Ensure a local API exists to connect with remote
-        if self.config.api is None:
-            if not bootstrap.setup_component(self, 'api'):
-                raise HomeAssistantError(
-                    'Unable to setup local API to receive events')
+        if self.config.api is None and not bootstrap.setup_component(self, 'api'):
+            raise HomeAssistantError(
+                'Unable to setup local API to receive events')
 
         ha.create_timer(self)
 
@@ -137,9 +136,9 @@ class HomeAssistant(ha.HomeAssistant):
         # Setup that events from remote_api get forwarded to local_api
         # Do this after we fire START, otherwise HTTP is not started
         if not connect_remote_events(self.remote_api, self.config.api):
-            raise HomeAssistantError((
-                'Could not setup event forwarding from api {} to '
-                'local api {}').format(self.remote_api, self.config.api))
+            raise HomeAssistantError(
+                f'Could not setup event forwarding from api {self.remote_api} to local api {self.config.api}'
+            )
 
     def stop(self):
         """ Stops Home Assistant and shuts down all threads. """
@@ -316,12 +315,11 @@ def connect_remote_events(from_api, to_api):
 
         if req.status_code == 200:
             return True
-        else:
-            _LOGGER.error(
-                "Error setting up event forwarding: %s - %s",
-                req.status_code, req.text)
+        _LOGGER.error(
+            "Error setting up event forwarding: %s - %s",
+            req.status_code, req.text)
 
-            return False
+        return False
 
     except HomeAssistantError:
         _LOGGER.exception("Error setting up event forwarding")
@@ -340,12 +338,11 @@ def disconnect_remote_events(from_api, to_api):
 
         if req.status_code == 200:
             return True
-        else:
-            _LOGGER.error(
-                "Error removing event forwarding: %s - %s",
-                req.status_code, req.text)
+        _LOGGER.error(
+            "Error removing event forwarding: %s - %s",
+            req.status_code, req.text)
 
-            return False
+        return False
 
     except HomeAssistantError:
         _LOGGER.exception("Error removing an event forwarder")
@@ -431,13 +428,12 @@ def set_state(api, entity_id, new_state, attributes=None):
                   URL_API_STATES_ENTITY.format(entity_id),
                   data)
 
-        if req.status_code not in (200, 201):
-            _LOGGER.error("Error changing state: %d - %s",
-                          req.status_code, req.text)
-            return False
-        else:
+        if req.status_code in (200, 201):
             return True
 
+        _LOGGER.error("Error changing state: %d - %s",
+                      req.status_code, req.text)
+        return False
     except HomeAssistantError:
         _LOGGER.exception("Error setting state")
 

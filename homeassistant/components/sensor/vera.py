@@ -77,7 +77,7 @@ class VeraSensor(Entity):
         self._temperature_units = None
 
     def __str__(self):
-        return "%s %s %s" % (self.name, self.vera_device.deviceId, self.state)
+        return f"{self.name} {self.vera_device.deviceId} {self.state}"
 
     @property
     def state(self):
@@ -97,7 +97,7 @@ class VeraSensor(Entity):
     def state_attributes(self):
         attr = {}
         if self.vera_device.has_battery:
-            attr[ATTR_BATTERY_LEVEL] = self.vera_device.battery_level + '%'
+            attr[ATTR_BATTERY_LEVEL] = f'{self.vera_device.battery_level}%'
 
         if self.vera_device.is_armable:
             armed = self.vera_device.refresh_value('Armed')

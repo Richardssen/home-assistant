@@ -52,11 +52,7 @@ def setup(hass, config):
         """ Maps services to methods on Alarm. """
         target_alarms = component.extract_from_service(service)
 
-        if ATTR_CODE not in service.data:
-            code = None
-        else:
-            code = service.data[ATTR_CODE]
-
+        code = None if ATTR_CODE not in service.data else service.data[ATTR_CODE]
         method = SERVICE_TO_METHOD[service.service]
 
         for alarm in target_alarms:
@@ -144,7 +140,6 @@ class AlarmControlPanel(Entity):
     @property
     def state_attributes(self):
         """ Return the state attributes. """
-        state_attr = {
+        return {
             ATTR_CODE_FORMAT: self.code_format,
-            }
-        return state_attr
+        }

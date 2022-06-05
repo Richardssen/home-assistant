@@ -82,10 +82,10 @@ class LuciDeviceScanner(object):
 
         with self.lock:
             if self.mac2name is None:
-                url = 'http://{}/cgi-bin/luci/rpc/uci'.format(self.host)
-                result = _req_json_rpc(url, 'get_all', 'dhcp',
-                                       params={'auth': self.token})
-                if result:
+                url = f'http://{self.host}/cgi-bin/luci/rpc/uci'
+                if result := _req_json_rpc(
+                    url, 'get_all', 'dhcp', params={'auth': self.token}
+                ):
                     hosts = [x for x in result.values()
                              if x['.type'] == 'host' and
                              'mac' in x and 'name' in x]
@@ -109,16 +109,15 @@ class LuciDeviceScanner(object):
         with self.lock:
             _LOGGER.info("Checking ARP")
 
-            url = 'http://{}/cgi-bin/luci/rpc/sys'.format(self.host)
-            result = _req_json_rpc(url, 'net.arptable',
-                                   params={'auth': self.token})
-            if result:
-                self.last_results = []
-                for device_entry in result:
-                    # Check if the Flags for each device contain
-                    # NUD_REACHABLE and if so, add it to last_results
-                    if int(device_entry['Flags'], 16) & 0x2:
-                        self.last_results.append(device_entry['HW address'])
+            url = f'http://{self.host}/cgi-bin/luci/rpc/sys'
+            if result := _req_json_rpc(
+                url, 'net.arptable', params={'auth': self.token}
+            ):
+                self.last_results = [
+                    device_entry['HW address']
+                    for device_entry in result
+                    if int(device_entry['Flags'], 16) & 0x2
+                ]
 
                 return True
 
@@ -157,5 +156,5 @@ def _req_json_rpc(url, method, *args, **kwargs):
 
 def _get_token(host, username, password):
     """ Get authentication token for the given host+username+password. """
-    url = 'http://{}/cgi-bin/luci/rpc/auth'.format(host)
+    url = f'http://{host}/cgi-bin/luci/rpc/auth'
     return _req_json_rpc(url, 'login', username, password)

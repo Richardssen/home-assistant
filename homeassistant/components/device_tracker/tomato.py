@@ -30,13 +30,15 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_scanner(hass, config):
     """ Validates config and returns a Tomato scanner. """
-    if not validate_config(config,
-                           {DOMAIN: [CONF_HOST, CONF_USERNAME,
-                                     CONF_PASSWORD, CONF_HTTP_ID]},
-                           _LOGGER):
-        return None
-
-    return TomatoDeviceScanner(config[DOMAIN])
+    return (
+        TomatoDeviceScanner(config[DOMAIN])
+        if validate_config(
+            config,
+            {DOMAIN: [CONF_HOST, CONF_USERNAME, CONF_PASSWORD, CONF_HTTP_ID]},
+            _LOGGER,
+        )
+        else None
+    )
 
 
 class TomatoDeviceScanner(object):
@@ -51,16 +53,17 @@ class TomatoDeviceScanner(object):
         host, http_id = config[CONF_HOST], config[CONF_HTTP_ID]
         username, password = config[CONF_USERNAME], config[CONF_PASSWORD]
 
-        self.req = requests.Request('POST',
-                                    'http://{}/update.cgi'.format(host),
-                                    data={'_http_id': http_id,
-                                          'exec': 'devlist'},
-                                    auth=requests.auth.HTTPBasicAuth(
-                                        username, password)).prepare()
+        self.req = requests.Request(
+            'POST',
+            f'http://{host}/update.cgi',
+            data={'_http_id': http_id, 'exec': 'devlist'},
+            auth=requests.auth.HTTPBasicAuth(username, password),
+        ).prepare()
+
 
         self.parse_api_pattern = re.compile(r"(?P<param>\w*) = (?P<value>.*);")
 
-        self.logger = logging.getLogger("{}.{}".format(__name__, "Tomato"))
+        self.logger = logging.getLogger(f"{__name__}.Tomato")
         self.lock = threading.Lock()
 
         self.last_results = {"wldev": [], "dhcpd_lease": []}
@@ -81,10 +84,7 @@ class TomatoDeviceScanner(object):
         filter_named = [item[0] for item in self.last_results['dhcpd_lease']
                         if item[2] == device]
 
-        if not filter_named or not filter_named[0]:
-            return None
-        else:
-            return filter_named[0]
+        return None if not filter_named or not filter_named[0] else filter_named[0]
 
     @Throttle(MIN_TIME_BETWEEN_SCANS)
     def _update_tomato_info(self):
@@ -103,10 +103,9 @@ class TomatoDeviceScanner(object):
                 #   blog/2013/10/tomato-api-documentation/
                 if response.status_code == 200:
 
-                    for param, value in \
-                            self.parse_api_pattern.findall(response.text):
+                    for param, value in self.parse_api_pattern.findall(response.text):
 
-                        if param == 'wldev' or param == 'dhcpd_lease':
+                        if param in ['wldev', 'dhcpd_lease']:
                             self.last_results[param] = \
                                 json.loads(value.replace("'", '"'))
 

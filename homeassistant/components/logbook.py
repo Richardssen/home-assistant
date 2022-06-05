@@ -61,9 +61,7 @@ def setup(hass, config):
 
 def _handle_get_logbook(handler, path_match, data):
     """ Return logbook entries. """
-    date_str = path_match.group('date')
-
-    if date_str:
+    if date_str := path_match.group('date'):
         start_date = dt_util.date_str_to_date(date_str)
 
         if start_date is None:
@@ -225,17 +223,9 @@ def _entry_message_from_state(domain, state):
     # pylint: disable=too-many-return-statements
 
     if domain == 'device_tracker':
-        if state.state == STATE_NOT_HOME:
-            return 'is away'
-        else:
-            return 'is at {}'.format(state.state)
-
+        return 'is away' if state.state == STATE_NOT_HOME else f'is at {state.state}'
     elif domain == 'sun':
-        if state.state == sun.STATE_ABOVE_HORIZON:
-            return 'has risen'
-        else:
-            return 'has set'
-
+        return 'has risen' if state.state == sun.STATE_ABOVE_HORIZON else 'has set'
     elif state.state == STATE_ON:
         # Future: combine groups and its entity entries ?
         return "turned on"
@@ -243,4 +233,4 @@ def _entry_message_from_state(domain, state):
     elif state.state == STATE_OFF:
         return "turned off"
 
-    return "changed to {}".format(state.state)
+    return f"changed to {state.state}"

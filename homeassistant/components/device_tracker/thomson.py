@@ -75,12 +75,18 @@ class ThomsonDeviceScanner(object):
     def get_device_name(self, device):
         """ Returns the name of the given device
             or None if we don't know. """
-        if not self.last_results:
-            return None
-        for client in self.last_results:
-            if client['mac'] == device:
-                return client['host']
-        return None
+        return (
+            next(
+                (
+                    client['host']
+                    for client in self.last_results
+                    if client['mac'] == device
+                ),
+                None,
+            )
+            if self.last_results
+            else None
+        )
 
     @Throttle(MIN_TIME_BETWEEN_SCANS)
     def _update_info(self):
@@ -125,8 +131,7 @@ class ThomsonDeviceScanner(object):
 
         devices = {}
         for device in devices_result:
-            match = _DEVICES_REGEX.search(device.decode('utf-8'))
-            if match:
+            if match := _DEVICES_REGEX.search(device.decode('utf-8')):
                 devices[match.group('ip')] = {
                     'ip': match.group('ip'),
                     'mac': match.group('mac').upper(),

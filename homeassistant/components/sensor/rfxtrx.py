@@ -31,23 +31,23 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
 
     def sensor_update(event):
         """ Callback for sensor updates from the RFXtrx gateway. """
-        if isinstance(event, SensorEvent):
-            entity_id = slugify(event.device.id_string.lower())
+        if not isinstance(event, SensorEvent):
+            return
+        entity_id = slugify(event.device.id_string.lower())
 
             # Add entity if not exist and the automatic_add is True
-            if entity_id not in rfxtrx.RFX_DEVICES:
-                automatic_add = config.get('automatic_add', True)
-                if automatic_add:
-                    _LOGGER.info("Automatic add %s rfxtrx.sensor", entity_id)
-                    new_sensor = RfxtrxSensor(event)
-                    rfxtrx.RFX_DEVICES[entity_id] = new_sensor
-                    add_devices_callback([new_sensor])
-            else:
-                _LOGGER.debug(
-                    "EntityID: %s sensor_update",
-                    entity_id,
-                )
-                rfxtrx.RFX_DEVICES[entity_id].event = event
+        if entity_id in rfxtrx.RFX_DEVICES:
+            _LOGGER.debug(
+                "EntityID: %s sensor_update",
+                entity_id,
+            )
+            rfxtrx.RFX_DEVICES[entity_id].event = event
+
+        elif automatic_add := config.get('automatic_add', True):
+            _LOGGER.info("Automatic add %s rfxtrx.sensor", entity_id)
+            new_sensor = RfxtrxSensor(event)
+            rfxtrx.RFX_DEVICES[entity_id] = new_sensor
+            add_devices_callback([new_sensor])
 
     if sensor_update not in rfxtrx.RECEIVED_EVT_SUBSCRIBERS:
         rfxtrx.RECEIVED_EVT_SUBSCRIBERS.append(sensor_update)
@@ -67,9 +67,7 @@ class RfxtrxSensor(Entity):
                 break
 
         id_string = int(event.device.id_string.replace(":", ""), 16)
-        self._name = "{} {} ({})".format(self._data_type,
-                                         self.event.device.type_string,
-                                         id_string)
+        self._name = f"{self._data_type} {self.event.device.type_string} ({id_string})"
 
     def __str__(self):
         return self._name
@@ -77,9 +75,7 @@ class RfxtrxSensor(Entity):
     @property
     def state(self):
         """ Returns the state of the device. """
-        if self._data_type:
-            return self.event.values[self._data_type]
-        return None
+        return self.event.values[self._data_type] if self._data_type else None
 
     @property
     def name(self):

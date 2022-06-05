@@ -385,14 +385,24 @@ def convert_csv_config(csv_path, yaml_path):
 
 def load_config(path, hass, consider_home, home_range):
     """ Load devices from YAML config file. """
-    if not os.path.isfile(path):
-        return []
-    return [
-        Device(hass, consider_home, home_range, device.get('track', False),
-               str(dev_id).lower(), str(device.get('mac')).upper(),
-               device.get('name'), device.get('picture'),
-               device.get(CONF_AWAY_HIDE, DEFAULT_AWAY_HIDE))
-        for dev_id, device in load_yaml_config_file(path).items()]
+    return (
+        [
+            Device(
+                hass,
+                consider_home,
+                home_range,
+                device.get('track', False),
+                str(dev_id).lower(),
+                str(device.get('mac')).upper(),
+                device.get('name'),
+                device.get('picture'),
+                device.get(CONF_AWAY_HIDE, DEFAULT_AWAY_HIDE),
+            )
+            for dev_id, device in load_yaml_config_file(path).items()
+        ]
+        if os.path.isfile(path)
+        else []
+    )
 
 
 def setup_scanner_platform(hass, config, scanner, see_device):

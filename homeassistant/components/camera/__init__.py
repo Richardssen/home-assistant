@@ -134,10 +134,16 @@ def setup(hass, config):
                 img_bytes = camera.camera_image()
                 if img_bytes is None:
                     continue
-                headers_str = '\r\n'.join((
-                    'Content-length: {}'.format(len(img_bytes)),
-                    'Content-type: image/jpeg',
-                )) + '\r\n\r\n'
+                headers_str = (
+                    '\r\n'.join(
+                        (
+                            f'Content-length: {len(img_bytes)}',
+                            'Content-type: image/jpeg',
+                        )
+                    )
+                    + '\r\n\r\n'
+                )
+
 
                 handler.request.sendall(
                     bytes(headers_str, 'utf-8') +

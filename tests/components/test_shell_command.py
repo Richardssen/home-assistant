@@ -28,11 +28,13 @@ class TestShellCommand(unittest.TestCase):
         """ Test if able to call a configured service. """
         with tempfile.TemporaryDirectory() as tempdirname:
             path = os.path.join(tempdirname, 'called.txt')
-            self.assertTrue(shell_command.setup(self.hass, {
-                'shell_command': {
-                    'test_service': "date > {}".format(path)
-                }
-            }))
+            self.assertTrue(
+                shell_command.setup(
+                    self.hass,
+                    {'shell_command': {'test_service': f"date > {path}"}},
+                )
+            )
+
 
             self.hass.services.call('shell_command', 'test_service',
                                     blocking=True)
@@ -58,11 +60,12 @@ class TestShellCommand(unittest.TestCase):
     def test_subprocess_raising_error(self, mock_call, mock_error):
         with tempfile.TemporaryDirectory() as tempdirname:
             path = os.path.join(tempdirname, 'called.txt')
-            self.assertTrue(shell_command.setup(self.hass, {
-                'shell_command': {
-                    'test_service': "touch {}".format(path)
-                }
-            }))
+            self.assertTrue(
+                shell_command.setup(
+                    self.hass, {'shell_command': {'test_service': f"touch {path}"}}
+                )
+            )
+
 
             self.hass.services.call('shell_command', 'test_service',
                                     blocking=True)

@@ -59,7 +59,7 @@ class DdWrtDeviceScanner(object):
         self.mac2name = {}
 
         # Test the router is accessible
-        url = 'http://{}/Status_Wireless.live.asp'.format(self.host)
+        url = f'http://{self.host}/Status_Wireless.live.asp'
         data = self.get_ddwrt_data(url)
         self.success_init = data is not None
 
@@ -78,7 +78,7 @@ class DdWrtDeviceScanner(object):
         with self.lock:
             # if not initialised and not already scanned and not found
             if device not in self.mac2name:
-                url = 'http://{}/Status_Lan.live.asp'.format(self.host)
+                url = f'http://{self.host}/Status_Lan.live.asp'
                 data = self.get_ddwrt_data(url)
 
                 if not data:
@@ -92,9 +92,9 @@ class DdWrtDeviceScanner(object):
                 # remove leading and trailing single quotes
                 cleaned_str = dhcp_leases.strip().strip('"')
                 elements = cleaned_str.split('","')
-                num_clients = int(len(elements)/5)
+                num_clients = len(elements) // 5
                 self.mac2name = {}
-                for idx in range(0, num_clients):
+                for idx in range(num_clients):
                     # this is stupid but the data is a single array
                     # every 5 elements represents one hosts, the MAC
                     # is the third element and the name is the first
@@ -117,7 +117,7 @@ class DdWrtDeviceScanner(object):
         with self.lock:
             _LOGGER.info("Checking ARP")
 
-            url = 'http://{}/Status_Wireless.live.asp'.format(self.host)
+            url = f'http://{self.host}/Status_Wireless.live.asp'
             data = self.get_ddwrt_data(url)
 
             if not data:
@@ -167,6 +167,4 @@ class DdWrtDeviceScanner(object):
 
 def _parse_ddwrt_response(data_str):
     """ Parse the DD-WRT data format. """
-    return {
-        key: val for key, val in _DDWRT_DATA_REGEX
-        .findall(data_str)}
+    return dict(_DDWRT_DATA_REGEX.findall(data_str))

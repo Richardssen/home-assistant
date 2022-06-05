@@ -25,8 +25,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     if modbus.TYPE == "serial" and not slave:
         _LOGGER.error("No slave number provided for serial Modbus")
         return False
-    registers = config.get("registers")
-    if registers:
+    if registers := config.get("registers"):
         for regnum, register in registers.items():
             if register.get("name"):
                 sensors.append(ModbusSensor(register.get("name"),
@@ -36,19 +35,17 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                                             register.get("unit")))
             if register.get("bits"):
                 bits = register.get("bits")
-                for bitnum, bit in bits.items():
-                    if bit.get("name"):
-                        sensors.append(ModbusSensor(bit.get("name"),
-                                                    slave,
-                                                    regnum,
-                                                    bitnum))
-    coils = config.get("coils")
-    if coils:
-        for coilnum, coil in coils.items():
-            sensors.append(ModbusSensor(coil.get("name"),
-                                        slave,
-                                        coilnum,
-                                        coil=True))
+                sensors.extend(
+                    ModbusSensor(bit.get("name"), slave, regnum, bitnum)
+                    for bitnum, bit in bits.items()
+                    if bit.get("name")
+                )
+
+    if coils := config.get("coils"):
+        sensors.extend(
+            ModbusSensor(coil.get("name"), slave, coilnum, coil=True)
+            for coilnum, coil in coils.items()
+        )
 
     add_devices(sensors)
 
@@ -67,7 +64,7 @@ class ModbusSensor(Entity):
         self._coil = coil
 
     def __str__(self):
-        return "%s: %s" % (self.name, self.state)
+        return f"{self.name}: {self.state}"
 
     @property
     def should_poll(self):
@@ -80,9 +77,7 @@ class ModbusSensor(Entity):
     @property
     def unique_id(self):
         """ Returns a unique id. """
-        return "MODBUS-SENSOR-{}-{}-{}".format(self.slave,
-                                               self.register,
-                                               self.bit)
+        return f"MODBUS-SENSOR-{self.slave}-{self.register}-{self.bit}"
 
     @property
     def state(self):
@@ -116,10 +111,5 @@ class ModbusSensor(Entity):
             result = modbus.NETWORK.read_holding_registers(
                 unit=self.slave, address=self.register,
                 count=1)
-            val = 0
-            for i, res in enumerate(result.registers):
-                val += res * (2**(i*16))
-            if self.bit:
-                self._value = val & (0x0001 << self.bit)
-            else:
-                self._value = val
+            val = sum(res * (2**(i*16)) for i, res in enumerate(result.registers))
+            self._value = val & (0x0001 << self.bit) if self.bit else val

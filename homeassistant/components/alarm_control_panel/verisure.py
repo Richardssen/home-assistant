@@ -25,13 +25,12 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         _LOGGER.error('A connection has not been made to Verisure mypages.')
         return False
 
-    alarms = []
-
-    alarms.extend([
+    alarms = [
         VerisureAlarm(value)
         for value in verisure.get_alarm_status().values()
         if verisure.SHOW_ALARM
-        ])
+    ]
+
 
     add_devices(alarms)
 
@@ -48,7 +47,7 @@ class VerisureAlarm(alarm.AlarmControlPanel):
     @property
     def name(self):
         """ Returns the name of the device. """
-        return 'Alarm {}'.format(self._id)
+        return f'Alarm {self._id}'
 
     @property
     def state(self):

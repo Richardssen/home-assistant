@@ -37,8 +37,8 @@ def get_scanner(hass, config):
     if not scanner.success_init:
         scanner = Tplink2DeviceScanner(config[DOMAIN])
 
-        if not scanner.success_init:
-            scanner = TplinkDeviceScanner(config[DOMAIN])
+    if not scanner.success_init:
+        scanner = TplinkDeviceScanner(config[DOMAIN])
 
     return scanner if scanner.success_init else None
 
@@ -91,14 +91,12 @@ class TplinkDeviceScanner(object):
         with self.lock:
             _LOGGER.info("Loading wireless clients...")
 
-            url = 'http://{}/userRpm/WlanStationRpm.htm'.format(self.host)
-            referer = 'http://{}'.format(self.host)
+            url = f'http://{self.host}/userRpm/WlanStationRpm.htm'
+            referer = f'http://{self.host}'
             page = requests.get(url, auth=(self.username, self.password),
                                 headers={'referer': referer})
 
-            result = self.parse_macs.findall(page.text)
-
-            if result:
+            if result := self.parse_macs.findall(page.text):
                 self.last_results = [mac.replace("-", ":") for mac in result]
                 return True
 
@@ -137,18 +135,16 @@ class Tplink2DeviceScanner(TplinkDeviceScanner):
         with self.lock:
             _LOGGER.info("Loading wireless clients...")
 
-            url = 'http://{}/data/map_access_wireless_client_grid.json' \
-                .format(self.host)
-            referer = 'http://{}'.format(self.host)
+            url = f'http://{self.host}/data/map_access_wireless_client_grid.json'
+            referer = f'http://{self.host}'
 
             # Router uses Authorization cookie instead of header
             # Let's create the cookie
-            username_password = '{}:{}'.format(self.username, self.password)
+            username_password = f'{self.username}:{self.password}'
             b64_encoded_username_password = base64.b64encode(
                 username_password.encode('ascii')
             ).decode('ascii')
-            cookie = 'Authorization=Basic {}' \
-                .format(b64_encoded_username_password)
+            cookie = f'Authorization=Basic {b64_encoded_username_password}'
 
             response = requests.post(url, headers={'referer': referer,
                                                    'cookie': cookie})
@@ -205,9 +201,8 @@ class Tplink3DeviceScanner(TplinkDeviceScanner):
 
         _LOGGER.info("Retrieving auth tokens...")
 
-        url = 'http://{}/cgi-bin/luci/;stok=/login?form=login' \
-            .format(self.host)
-        referer = 'http://{}/webpages/login.html'.format(self.host)
+        url = f'http://{self.host}/cgi-bin/luci/;stok=/login?form=login'
+        referer = f'http://{self.host}/webpages/login.html'
 
         # if possible implement rsa encryption of password here
 
@@ -222,7 +217,7 @@ class Tplink3DeviceScanner(TplinkDeviceScanner):
             _LOGGER.info(self.stok)
             regex_result = re.search('sysauth=(.*);',
                                      response.headers['set-cookie'])
-            self.sysauth = regex_result.group(1)
+            self.sysauth = regex_result[1]
             _LOGGER.info(self.sysauth)
             return True
         except ValueError:
@@ -242,9 +237,9 @@ class Tplink3DeviceScanner(TplinkDeviceScanner):
 
             _LOGGER.info("Loading wireless clients...")
 
-            url = 'http://{}/cgi-bin/luci/;stok={}/admin/wireless?form=statistics' \
-                .format(self.host, self.stok)
-            referer = 'http://{}/webpages/index.html'.format(self.host)
+            url = f'http://{self.host}/cgi-bin/luci/;stok={self.stok}/admin/wireless?form=statistics'
+
+            referer = f'http://{self.host}/webpages/index.html'
 
             response = requests.post(url,
                                      params={'operation': 'load'},
@@ -262,11 +257,10 @@ class Tplink3DeviceScanner(TplinkDeviceScanner):
                                      "Relogging on next scan.")
                         self.stok = ''
                         self.sysauth = ''
-                        return False
                     else:
                         _LOGGER.error("An unknown error happened "
                                       "while fetching data.")
-                        return False
+                    return False
             except ValueError:
                 _LOGGER.error("Router didn't respond with JSON. "
                               "Check if credentials are correct.")

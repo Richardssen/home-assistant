@@ -26,13 +26,13 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         _LOGGER.error('A connection has not been made to the Arduino board.')
         return False
 
-    sensors = []
     pins = config.get('pins')
-    for pinnum, pin in pins.items():
-        if pin.get('name'):
-            sensors.append(ArduinoSensor(pin.get('name'),
-                                         pinnum,
-                                         'analog'))
+    sensors = [
+        ArduinoSensor(pin.get('name'), pinnum, 'analog')
+        for pinnum, pin in pins.items()
+        if pin.get('name')
+    ]
+
     add_devices(sensors)
 
 

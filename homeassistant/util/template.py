@@ -74,7 +74,7 @@ class DomainStates(object):
         self._domain = domain
 
     def __getattr__(self, name):
-        return self._hass.states.get('{}.{}'.format(self._domain, name))
+        return self._hass.states.get(f'{self._domain}.{name}')
 
     def __iter__(self):
         return iter(sorted(

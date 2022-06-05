@@ -66,7 +66,7 @@ class WinkToggleDevice(ToggleEntity):
     @property
     def unique_id(self):
         """ Returns the id of this Wink switch. """
-        return "{}.{}".format(self.__class__, self.wink.device_id())
+        return f"{self.__class__}.{self.wink.device_id()}"
 
     @property
     def name(self):

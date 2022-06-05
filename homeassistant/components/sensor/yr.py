@@ -101,7 +101,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
                 dev.append(YrSensor(variable, weather))
 
     # add symbol as default sensor
-    if len(dev) == 0:
+    if not dev:
         dev.append(YrSensor("symbol", weather))
     add_devices(dev)
 
@@ -124,7 +124,7 @@ class YrSensor(Entity):
 
     @property
     def name(self):
-        return '{} {}'.format(self.client_name, self._name)
+        return f'{self.client_name} {self._name}'
 
     @property
     def state(self):
@@ -134,9 +134,10 @@ class YrSensor(Entity):
     @property
     def state_attributes(self):
         """ Returns state attributes. """
-        data = {}
-        data[''] = "Weather forecast from yr.no, delivered by the"\
-            " Norwegian Meteorological Institute and the NRK"
+        data = {
+            '': "Weather forecast from yr.no, delivered by the Norwegian Meteorological Institute and the NRK"
+        }
+
         if self.type == 'symbol':
             symbol_nr = self._state
             data[ATTR_ENTITY_PICTURE] = "http://api.met.no/weatherapi/weathericon/1.1/" \

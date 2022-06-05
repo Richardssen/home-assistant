@@ -19,5 +19,4 @@ class NoEntitySpecifiedError(HomeAssistantError):
 class TemplateError(HomeAssistantError):
     """ Error during template rendering. """
     def __init__(self, exception):
-        super().__init__('{}: {}'.format(exception.__class__.__name__,
-                                         exception))
+        super().__init__(f'{exception.__class__.__name__}: {exception}')

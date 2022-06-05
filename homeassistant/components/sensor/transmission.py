@@ -81,7 +81,7 @@ class TransmissionSensor(Entity):
 
     @property
     def name(self):
-        return self.client_name + ' ' + self._name
+        return f'{self.client_name} {self._name}'
 
     @property
     def state(self):
@@ -101,9 +101,7 @@ class TransmissionSensor(Entity):
             try:
                 _THROTTLED_REFRESH()
             except TransmissionError:
-                _LOGGER.exception(
-                    self.name + "  Connection to Transmission API failed."
-                )
+                _LOGGER.exception(f"{self.name}  Connection to Transmission API failed.")
 
     def update(self):
         """ Gets the latest data from Transmission and updates the state. """

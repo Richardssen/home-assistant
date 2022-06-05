@@ -174,21 +174,18 @@ class RequestHandler(SimpleHTTPRequestHandler):
                 fmt, *(arg.replace(self.server.api_password, '*******')
                        if isinstance(arg, str) else arg for arg in arguments))
 
-    def _handle_request(self, method):  # pylint: disable=too-many-branches
+    def _handle_request(self, method):    # pylint: disable=too-many-branches
         """ Does some common checks and calls appropriate method. """
         url = urlparse(self.path)
 
         # Read query input. parse_qs gives a list for each value, we want last
         data = {key: data[-1] for key, data in parse_qs(url.query).items()}
 
-        # Did we get post input ?
-        content_length = int(self.headers.get(HTTP_HEADER_CONTENT_LENGTH, 0))
-
-        if content_length:
+        if content_length := int(self.headers.get(HTTP_HEADER_CONTENT_LENGTH, 0)):
             body_content = self.rfile.read(content_length).decode("UTF-8")
 
             try:
-                data.update(json.loads(body_content))
+                data |= json.loads(body_content)
             except (TypeError, ValueError):
                 # TypeError if JSON object is not a dict
                 # ValueError if we could not parse JSON
@@ -349,9 +346,7 @@ class RequestHandler(SimpleHTTPRequestHandler):
         # 1 year in seconds
         cache_time = 365 * 86400
 
-        self.send_header(
-            HTTP_HEADER_CACHE_CONTROL,
-            "public, max-age={}".format(cache_time))
+        self.send_header(HTTP_HEADER_CACHE_CONTROL, f"public, max-age={cache_time}")
         self.send_header(
             HTTP_HEADER_EXPIRES,
             self.date_time_string(time.time()+cache_time))
@@ -368,9 +363,9 @@ class RequestHandler(SimpleHTTPRequestHandler):
             return session_id
 
         self.send_header(
-            'Set-Cookie',
-            '{}={}'.format(SESSION_KEY, self.server.sessions.create())
+            'Set-Cookie', f'{SESSION_KEY}={self.server.sessions.create()}'
         )
+
 
         return session_id
 

@@ -82,8 +82,9 @@ class TestRemoteMethods(unittest.TestCase):
 
         self.assertEqual(
             remote.APIStatus.INVALID_PASSWORD,
-            remote.validate_api(
-                remote.API("127.0.0.1", API_PASSWORD + "A", 8122)))
+            remote.validate_api(remote.API("127.0.0.1", f"{API_PASSWORD}A", 8122)),
+        )
+
 
         self.assertEqual(
             remote.APIStatus.CANNOT_CONNECT, remote.validate_api(broken_api))
@@ -196,8 +197,11 @@ class TestRemoteClasses(unittest.TestCase):
         """ Test HomeAssistant init. """
         # Wrong password
         self.assertRaises(
-            ha.HomeAssistantError, remote.HomeAssistant,
-            remote.API('127.0.0.1', API_PASSWORD + 'A', 8124))
+            ha.HomeAssistantError,
+            remote.HomeAssistant,
+            remote.API('127.0.0.1', f'{API_PASSWORD}A', 8124),
+        )
+
 
         # Wrong port
         self.assertRaises(

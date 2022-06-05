@@ -57,7 +57,6 @@ class TelegramNotificationService(BaseNotificationService):
         title = kwargs.get(ATTR_TITLE)
 
         try:
-            self.bot.sendMessage(chat_id=self._chat_id,
-                                 text=title + "  " + message)
+            self.bot.sendMessage(chat_id=self._chat_id, text=f"{title}  {message}")
         except telegram.error.TelegramError:
             _LOGGER.exception("Error sending message.")

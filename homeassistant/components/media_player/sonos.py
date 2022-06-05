@@ -83,7 +83,7 @@ class SonosDevice(MediaPlayerDevice):
     @property
     def unique_id(self):
         """ Returns a unique id. """
-        return "{}.{}".format(self.__class__, self._player.uid)
+        return f"{self.__class__}.{self._player.uid}"
 
     @property
     def state(self):

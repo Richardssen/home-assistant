@@ -21,13 +21,12 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         _LOGGER.error('A connection has not been made to Verisure mypages.')
         return False
 
-    switches = []
-
-    switches.extend([
+    switches = [
         VerisureSmartplug(value)
         for value in verisure.get_smartplug_status().values()
         if verisure.SHOW_SMARTPLUGS
-        ])
+    ]
+
 
     add_devices(switches)
 

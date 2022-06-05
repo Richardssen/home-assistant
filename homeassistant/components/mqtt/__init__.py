@@ -148,11 +148,7 @@ class MQTT(object):
             'progress': {},
         }
 
-        if client_id is None:
-            self._mqttc = mqtt.Client()
-        else:
-            self._mqttc = mqtt.Client(client_id)
-
+        self._mqttc = mqtt.Client() if client_id is None else mqtt.Client(client_id)
         self._mqttc.user_data_set(self.userdata)
 
         if username is not None:
@@ -274,7 +270,7 @@ def _mqtt_on_disconnect(mqttc, userdata, result_code):
 def _raise_on_error(result):
     """ Raise error if error result. """
     if result != 0:
-        raise HomeAssistantError('Error talking to MQTT: {}'.format(result))
+        raise HomeAssistantError(f'Error talking to MQTT: {result}')
 
 
 def _match_topic(subscription, topic):

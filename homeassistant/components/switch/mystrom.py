@@ -24,7 +24,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
         _LOGGER.error('Missing required variable: host')
         return False
 
-    resource = 'http://{}'.format(host)
+    resource = f'http://{host}'
 
     try:
         requests.get(resource, timeout=10)
@@ -65,9 +65,10 @@ class MyStromSwitch(SwitchDevice):
     def turn_on(self, **kwargs):
         """ Turn the switch on. """
         try:
-            request = requests.get('{}/relay'.format(self._resource),
-                                   params={'state': '1'},
-                                   timeout=10)
+            request = requests.get(
+                f'{self._resource}/relay', params={'state': '1'}, timeout=10
+            )
+
             if request.status_code == 200:
                 self._state = True
         except requests.exceptions.ConnectionError:
@@ -77,9 +78,10 @@ class MyStromSwitch(SwitchDevice):
     def turn_off(self, **kwargs):
         """ Turn the switch off. """
         try:
-            request = requests.get('{}/relay'.format(self._resource),
-                                   params={'state': '0'},
-                                   timeout=10)
+            request = requests.get(
+                f'{self._resource}/relay', params={'state': '0'}, timeout=10
+            )
+
             if request.status_code == 200:
                 self._state = False
         except requests.exceptions.ConnectionError:
@@ -89,8 +91,7 @@ class MyStromSwitch(SwitchDevice):
     def update(self):
         """ Gets the latest data from REST API and updates the state. """
         try:
-            request = requests.get('{}/report'.format(self._resource),
-                                   timeout=10)
+            request = requests.get(f'{self._resource}/report', timeout=10)
             data = request.json()
             self._state = bool(data['relay'])
             self.consumption = data['power']

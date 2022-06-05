@@ -564,9 +564,7 @@ class MediaPlayerDevice(Entity):
             if self.media_image_url:
                 state_attr[ATTR_ENTITY_PICTURE] = self.media_image_url
 
-        device_attr = self.device_state_attributes
-
-        if device_attr:
-            state_attr.update(device_attr)
+        if device_attr := self.device_state_attributes:
+            state_attr |= device_attr
 
         return state_attr

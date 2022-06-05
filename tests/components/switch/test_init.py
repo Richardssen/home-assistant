@@ -89,9 +89,12 @@ class TestSwitch(unittest.TestCase):
         loader.set_component('switch.test2', test_platform)
         test_platform.init(False)
 
-        self.assertTrue(switch.setup(
-            self.hass, {
-                switch.DOMAIN: {CONF_PLATFORM: 'test'},
-                '{} 2'.format(switch.DOMAIN): {CONF_PLATFORM: 'test2'},
-            }
-        ))
+        self.assertTrue(
+            switch.setup(
+                self.hass,
+                {
+                    switch.DOMAIN: {CONF_PLATFORM: 'test'},
+                    f'{switch.DOMAIN} 2': {CONF_PLATFORM: 'test2'},
+                },
+            )
+        )

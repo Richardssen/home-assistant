@@ -60,9 +60,7 @@ def setup_scanner(hass, config, see):
             # Loop through every device registered with the iCloud account
             for device in api.devices:
                 status = device.status()
-                location = device.location()
-                # If the device has a location add it. If not do nothing
-                if location:
+                if location := device.location():
                     see(
                         dev_id=re.sub(r"(\s|\W|')",
                                       '',

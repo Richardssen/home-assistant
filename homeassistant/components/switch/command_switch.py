@@ -19,14 +19,15 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
     """ Find and return switches controlled by shell commands. """
 
     switches = config.get('switches', {})
-    devices = []
+    devices = [
+        CommandSwitch(
+            properties.get('name', dev_name),
+            properties.get('oncmd', 'true'),
+            properties.get('offcmd', 'true'),
+        )
+        for dev_name, properties in switches.items()
+    ]
 
-    for dev_name, properties in switches.items():
-        devices.append(
-            CommandSwitch(
-                properties.get('name', dev_name),
-                properties.get('oncmd', 'true'),
-                properties.get('offcmd', 'true')))
 
     add_devices_callback(devices)
 

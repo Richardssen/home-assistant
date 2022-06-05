@@ -27,15 +27,19 @@ def ensure_config_path(config_dir):
     # Test if configuration directory exists
     if not os.path.isdir(config_dir):
         if config_dir != config_util.get_default_config_dir():
-            print(('Fatal Error: Specified configuration directory does '
-                   'not exist {} ').format(config_dir))
+            print(
+                f'Fatal Error: Specified configuration directory does not exist {config_dir} '
+            )
+
             sys.exit(1)
 
         try:
             os.mkdir(config_dir)
         except OSError:
-            print(('Fatal Error: Unable to create default configuration '
-                   'directory {} ').format(config_dir))
+            print(
+                f'Fatal Error: Unable to create default configuration directory {config_dir} '
+            )
+
             sys.exit(1)
 
     # Test if library directory exists
@@ -43,8 +47,7 @@ def ensure_config_path(config_dir):
         try:
             os.mkdir(lib_dir)
         except OSError:
-            print(('Fatal Error: Unable to create library '
-                   'directory {} ').format(lib_dir))
+            print(f'Fatal Error: Unable to create library directory {lib_dir} ')
             sys.exit(1)
 
 
@@ -160,7 +163,7 @@ def write_pid(pid_file):
     try:
         open(pid_file, 'w').write(str(pid))
     except IOError:
-        print('Fatal Error: Unable to write pid file {}'.format(pid_file))
+        print(f'Fatal Error: Unable to write pid file {pid_file}')
         sys.exit(1)
 
 
@@ -187,10 +190,10 @@ def install_osx():
         with open(path, 'w', encoding='utf-8') as outp:
             outp.write(plist)
     except IOError as err:
-        print('Unable to write to ' + path, err)
+        print(f'Unable to write to {path}', err)
         return
 
-    os.popen('launchctl load -w -F ' + path)
+    os.popen(f'launchctl load -w -F {path}')
 
     print("Home Assistant has been installed. \
         Open it here: http://localhost:8123")
@@ -199,7 +202,7 @@ def install_osx():
 def uninstall_osx():
     """ Unload from launchd on OS X """
     path = os.path.expanduser("~/Library/LaunchAgents/org.homeassistant.plist")
-    os.popen('launchctl unload ' + path)
+    os.popen(f'launchctl unload {path}')
 
     print("Home Assistant has been uninstalled.")
 

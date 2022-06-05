@@ -151,7 +151,7 @@ class TestAutomationState(unittest.TestCase):
 
         self.assertEqual(1, len(self.calls))
 
-        self.hass.states.set(entity_id, test_state + 'something')
+        self.hass.states.set(entity_id, f'{test_state}something')
         self.hass.bus.fire('test_event')
         self.hass.pool.block_till_done()
 
@@ -330,7 +330,7 @@ class TestAutomationState(unittest.TestCase):
 
         self.assertEqual(1, len(self.calls))
 
-        self.hass.states.set(entity_id, test_state + 'something')
+        self.hass.states.set(entity_id, f'{test_state}something')
         self.hass.bus.fire('test_event')
         self.hass.pool.block_till_done()
 

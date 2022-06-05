@@ -41,7 +41,7 @@ class WinkLockDevice(LockDevice):
     @property
     def unique_id(self):
         """ Returns the id of this wink lock """
-        return "{}.{}".format(self.__class__, self.wink.device_id())
+        return f"{self.__class__}.{self.wink.device_id()}"
 
     @property
     def name(self):

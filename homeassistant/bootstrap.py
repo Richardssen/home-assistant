@@ -55,11 +55,9 @@ def setup_component(hass, domain, config=None):
     if not components:
         return False
 
-    for component in components:
-        if not _setup_component(hass, component, config):
-            return False
-
-    return True
+    return all(
+        _setup_component(hass, component, config) for component in components
+    )
 
 
 def _handle_requirements(hass, component, name):
@@ -82,10 +80,11 @@ def _setup_component(hass, domain, config):
         return True
     component = loader.get_component(domain)
 
-    missing_deps = [dep for dep in getattr(component, 'DEPENDENCIES', [])
-                    if dep not in hass.config.components]
-
-    if missing_deps:
+    if missing_deps := [
+        dep
+        for dep in getattr(component, 'DEPENDENCIES', [])
+        if dep not in hass.config.components
+    ]:
         _LOGGER.error(
             'Not initializing %s because not all dependencies loaded: %s',
             domain, ", ".join(missing_deps))
@@ -188,8 +187,7 @@ def from_config_dict(config, hass=None, config_dir=None, enable_log=True,
         dict, {key: value or {} for key, value in config.items()})
 
     # Filter out the repeating and common config section [homeassistant]
-    components = set(key.split(' ')[0] for key in config.keys()
-                     if key != core.DOMAIN)
+    components = {key.split(' ')[0] for key in config if key != core.DOMAIN}
 
     if not core_components.setup(hass, config):
         _LOGGER.error('Home Assistant core failed to initialize. '
@@ -316,9 +314,7 @@ def process_ha_core_config(hass, config):
         if time_zone_str is None:
             return
 
-        time_zone = date_util.get_time_zone(time_zone_str)
-
-        if time_zone:
+        if time_zone := date_util.get_time_zone(time_zone_str):
             hac.time_zone = time_zone
             date_util.set_default_time_zone(time_zone)
         else:

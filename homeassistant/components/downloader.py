@@ -118,7 +118,7 @@ def setup(hass, config):
                     while os.path.isfile(final_path):
                         tries += 1
 
-                        final_path = "{}_{}.{}".format(path, tries, ext)
+                        final_path = f"{path}_{tries}.{ext}"
 
                     logger.info("%s -> %s", url, final_path)
 

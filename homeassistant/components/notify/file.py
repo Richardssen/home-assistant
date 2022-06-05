@@ -53,7 +53,7 @@ class FileNotificationService(BaseNotificationService):
 
             if self.add_timestamp == 1:
                 text = '{} {}\n'.format(dt_util.utcnow(), message)
-                file.write(text)
             else:
                 text = '{}\n'.format(message)
-                file.write(text)
+
+            file.write(text)

@@ -95,11 +95,7 @@ class TellstickLight(Light):
         """ Turns the switch on. """
         brightness = kwargs.get(ATTR_BRIGHTNESS)
 
-        if brightness is None:
-            self._brightness = 255
-        else:
-            self._brightness = brightness
-
+        self._brightness = 255 if brightness is None else brightness
         for _ in range(self.signal_repetitions):
             self.tellstick_device.dim(self._brightness)
         self.update_ha_state()
@@ -115,9 +111,11 @@ class TellstickLight(Light):
             self._brightness = 255
         elif last_command == tellcore_constants.TELLSTICK_TURNOFF:
             self._brightness = 0
-        elif (last_command == tellcore_constants.TELLSTICK_DIM or
-              last_command == tellcore_constants.TELLSTICK_UP or
-              last_command == tellcore_constants.TELLSTICK_DOWN):
+        elif last_command in [
+            tellcore_constants.TELLSTICK_DIM,
+            tellcore_constants.TELLSTICK_UP,
+            tellcore_constants.TELLSTICK_DOWN,
+        ]:
             last_sent_value = self.tellstick_device.last_sent_value()
             if last_sent_value is not None:
                 self._brightness = last_sent_value

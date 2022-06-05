@@ -25,8 +25,7 @@ def get_local_version():
     try:
         with open(VERSION_OUTPUT) as inp:
             for line in inp:
-                match = CUR_VERSION.search(line)
-                if match:
+                if match := CUR_VERSION.search(line):
                     return match.group(1)
     except FileNotFoundError:
         return False
@@ -43,8 +42,8 @@ def get_remote_version():
         print("Unable to find download link")
         sys.exit()
 
-    url = 'https://materialdesignicons.com' + mdi_download.group(1)
-    version = mdi_download.group(2).replace('-', '')
+    url = 'https://materialdesignicons.com' + mdi_download[1]
+    version = mdi_download[2].replace('-', '')
 
     return version, url
 

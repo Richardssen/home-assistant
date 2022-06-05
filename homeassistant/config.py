@@ -69,9 +69,7 @@ def create_default_config(config_dir, detect_location=True):
 
     info = {attr: default for attr, default, _, _ in DEFAULT_CONFIG}
 
-    location_info = detect_location and loc_util.detect_location_info()
-
-    if location_info:
+    if location_info := detect_location and loc_util.detect_location_info():
         if location_info.use_fahrenheit:
             info[CONF_TEMPERATURE_UNIT] = 'F'
 
@@ -130,7 +128,7 @@ def load_yaml_config_file(config_path):
                 # We convert that to an empty dict
                 return yaml.load(conf_file) or {}
         except yaml.YAMLError:
-            error = 'Error reading YAML configuration file {}'.format(fname)
+            error = f'Error reading YAML configuration file {fname}'
             _LOGGER.exception(error)
             raise HomeAssistantError(error)
 

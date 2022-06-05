@@ -40,7 +40,7 @@ class Itunes(object):
     @property
     def _base_url(self):
         """ Returns the base url for endpoints. """
-        return self.host + ":" + str(self.port)
+        return f"{self.host}:{str(self.port)}"
 
     def _request(self, method, path, params=None):
         """ Makes the actual request and returns the parsed response. """
@@ -49,9 +49,7 @@ class Itunes(object):
         try:
             if method == 'GET':
                 response = requests.get(url)
-            elif method == "POST":
-                response = requests.put(url, params)
-            elif method == "PUT":
+            elif method in ["POST", "PUT"]:
                 response = requests.put(url, params)
             elif method == "DELETE":
                 response = requests.delete(url)
@@ -64,7 +62,7 @@ class Itunes(object):
 
     def _command(self, named_command):
         """ Makes a request for a controlling command. """
-        return self._request('PUT', '/' + named_command)
+        return self._request('PUT', f'/{named_command}')
 
     def now_playing(self):
         """ Returns the current state. """
@@ -99,18 +97,18 @@ class Itunes(object):
         response = self._request('GET', '/playlists')
         playlists = response.get('playlists', [])
 
-        found_playlists = \
-            [playlist for playlist in playlists if
-             (playlist_id_or_name in [playlist["name"], playlist["id"]])]
-
-        if len(found_playlists) > 0:
+        if found_playlists := [
+            playlist
+            for playlist in playlists
+            if (playlist_id_or_name in [playlist["name"], playlist["id"]])
+        ]:
             playlist = found_playlists[0]
             path = '/playlists/' + playlist['id'] + '/play'
             return self._request('PUT', path)
 
     def artwork_url(self):
         """ Returns a URL of the current track's album art. """
-        return self._base_url + '/artwork'
+        return f'{self._base_url}/artwork'
 
     def airplay_devices(self):
         """ Returns a list of AirPlay devices. """
@@ -118,17 +116,17 @@ class Itunes(object):
 
     def airplay_device(self, device_id):
         """ Returns an AirPlay device. """
-        return self._request('GET', '/airplay_devices/' + device_id)
+        return self._request('GET', f'/airplay_devices/{device_id}')
 
     def toggle_airplay_device(self, device_id, toggle):
         """ Toggles airplay device on or off, id, toggle True or False. """
         command = 'on' if toggle else 'off'
-        path = '/airplay_devices/' + device_id + '/' + command
+        path = f'/airplay_devices/{device_id}/{command}'
         return self._request('PUT', path)
 
     def set_volume_airplay_device(self, device_id, level):
         """ Sets volume, returns current state of device, id,level 0-100. """
-        path = '/airplay_devices/' + device_id + '/volume'
+        path = f'/airplay_devices/{device_id}/volume'
         return self._request('PUT', path, {'level': level})
 
 
@@ -203,10 +201,7 @@ class ItunesDevice(MediaPlayerDevice):
         if self.player_state == 'stopped':
             return STATE_IDLE
 
-        if self.player_state == 'paused':
-            return STATE_PAUSED
-        else:
-            return STATE_PLAYING
+        return STATE_PAUSED if self.player_state == 'paused' else STATE_PLAYING
 
     def update(self):
         """ Retrieve latest state. """
@@ -355,7 +350,7 @@ class AirPlayDevice(MediaPlayerDevice):
 
         if 'name' in state_hash:
             name = state_hash.get('name', '')
-            self.device_name = (name + ' AirTunes Speaker').strip()
+            self.device_name = f'{name} AirTunes Speaker'.strip()
 
         if 'kind' in state_hash:
             self.kind = state_hash.get('kind', None)
@@ -384,10 +379,7 @@ class AirPlayDevice(MediaPlayerDevice):
     def state(self):
         """ Returns the state of the device. """
 
-        if self.selected is True:
-            return STATE_ON
-        else:
-            return STATE_OFF
+        return STATE_ON if self.selected is True else STATE_OFF
 
     def update(self):
         """ Retrieve latest state. """
@@ -408,19 +400,14 @@ class AirPlayDevice(MediaPlayerDevice):
     @property
     def device_state_attributes(self):
         """ Return the state attributes. """
-        state_attr = {}
-        state_attr[ATTR_SUPPORTED_MEDIA_COMMANDS] = SUPPORT_AIRPLAY
-
-        if self.state == STATE_OFF:
-            state_attr[ATTR_ENTITY_PICTURE] = \
-                ('https://cloud.githubusercontent.com/assets/260/9833073'
-                 '/6eb5c906-5958-11e5-9b4a-472cdf36be16.png')
-        else:
-            state_attr[ATTR_ENTITY_PICTURE] = \
-                ('https://cloud.githubusercontent.com/assets/260/9833072'
-                 '/6eb13cce-5958-11e5-996f-e2aaefbc9a24.png')
-
-        return state_attr
+        return {
+            ATTR_SUPPORTED_MEDIA_COMMANDS: SUPPORT_AIRPLAY,
+            ATTR_ENTITY_PICTURE: 'https://cloud.githubusercontent.com/assets/260/9833073'
+            '/6eb5c906-5958-11e5-9b4a-472cdf36be16.png'
+            if self.state == STATE_OFF
+            else 'https://cloud.githubusercontent.com/assets/260/9833072'
+            '/6eb13cce-5958-11e5-996f-e2aaefbc9a24.png',
+        }
 
     def set_volume_level(self, volume):
         """ set volume level, range 0..1. """

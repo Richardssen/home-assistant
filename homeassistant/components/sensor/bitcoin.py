@@ -136,7 +136,7 @@ class BitcoinSensor(Entity):
         elif self.type == 'miners_revenue_usd':
             self._state = '{0:.0f}'.format(stats.miners_revenue_usd)
         elif self.type == 'btc_mined':
-            self._state = '{}'.format(stats.btc_mined * 0.00000001)
+            self._state = f'{stats.btc_mined * 0.00000001}'
         elif self.type == 'trade_volume_usd':
             self._state = '{0:.1f}'.format(stats.trade_volume_usd)
         elif self.type == 'difficulty':
@@ -144,13 +144,13 @@ class BitcoinSensor(Entity):
         elif self.type == 'minutes_between_blocks':
             self._state = '{0:.2f}'.format(stats.minutes_between_blocks)
         elif self.type == 'number_of_transactions':
-            self._state = '{}'.format(stats.number_of_transactions)
+            self._state = f'{stats.number_of_transactions}'
         elif self.type == 'hash_rate':
             self._state = '{0:.1f}'.format(stats.hash_rate * 0.000001)
         elif self.type == 'timestamp':
             self._state = stats.timestamp
         elif self.type == 'mined_blocks':
-            self._state = '{}'.format(stats.mined_blocks)
+            self._state = f'{stats.mined_blocks}'
         elif self.type == 'blocks_size':
             self._state = '{0:.1f}'.format(stats.blocks_size)
         elif self.type == 'total_fees_btc':

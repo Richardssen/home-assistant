@@ -80,7 +80,7 @@ class SabnzbdSensor(Entity):
 
     @property
     def name(self):
-        return self.client_name + ' ' + self._name
+        return f'{self.client_name} {self._name}'
 
     @property
     def state(self):
@@ -99,9 +99,7 @@ class SabnzbdSensor(Entity):
             try:
                 _THROTTLED_REFRESH()
             except SabnzbdApiException:
-                _LOGGER.exception(
-                    self.name + "  Connection to SABnzbd API failed."
-                )
+                _LOGGER.exception(f"{self.name}  Connection to SABnzbd API failed.")
 
     def update(self):
         self.refresh_sabnzbd_data()

@@ -45,10 +45,10 @@ def check_package_exists(package, lib_dir):
         req = pkg_resources.Requirement.parse(urlparse(package).fragment)
 
     # Check packages from lib dir
-    if lib_dir is not None:
-        if any(dist in req for dist in
-               pkg_resources.find_distributions(lib_dir)):
-            return True
+    if lib_dir is not None and any(
+        dist in req for dist in pkg_resources.find_distributions(lib_dir)
+    ):
+        return True
 
     # Check packages from global + virtual environment
     # pylint: disable=not-an-iterable

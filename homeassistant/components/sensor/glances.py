@@ -49,7 +49,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 
     host = config.get(CONF_HOST)
     port = config.get('port', CONF_PORT)
-    url = 'http://{}:{}{}'.format(host, port, _RESOURCE)
+    url = f'http://{host}:{port}{_RESOURCE}'
     var_conf = config.get(CONF_RESOURCES)
 
     if None in (host, var_conf):
@@ -101,7 +101,7 @@ class GlancesSensor(Entity):
         if self._name is None:
             return SENSOR_TYPES[self.type][0]
         else:
-            return '{} {}'.format(self._name, SENSOR_TYPES[self.type][0])
+            return f'{self._name} {SENSOR_TYPES[self.type][0]}'
 
     @property
     def unit_of_measurement(self):
@@ -159,7 +159,7 @@ class GlancesData(object):
 
     def __init__(self, resource):
         self._resource = resource
-        self.data = dict()
+        self.data = {}
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):

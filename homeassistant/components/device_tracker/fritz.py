@@ -98,11 +98,11 @@ class FritzBoxScanner(object):
     def scan_devices(self):
         """ Scan for new devices and return a list of found device ids. """
         self._update_info()
-        active_hosts = []
-        for known_host in self.last_results:
-            if known_host["status"] == "1":
-                active_hosts.append(known_host["mac"])
-        return active_hosts
+        return [
+            known_host["mac"]
+            for known_host in self.last_results
+            if known_host["status"] == "1"
+        ]
 
     def get_device_name(self, mac):
         """ Returns the name of the given device or None if is not known. """

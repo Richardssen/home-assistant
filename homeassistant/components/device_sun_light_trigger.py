@@ -63,9 +63,7 @@ def setup(hass, config):
     def calc_time_for_light_when_sunset():
         """ Calculates the time when to start fading lights in when sun sets.
         Returns None if no next_setting data available. """
-        next_setting = sun.next_setting(hass)
-
-        if next_setting:
+        if next_setting := sun.next_setting(hass):
             return next_setting - LIGHT_TRANSITION_TIME * len(light_ids)
         else:
             return None

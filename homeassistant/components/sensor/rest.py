@@ -118,7 +118,7 @@ class RestDataGet(object):
     def __init__(self, resource, verify_ssl):
         self._resource = resource
         self._verify_ssl = verify_ssl
-        self.data = dict()
+        self.data = {}
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
@@ -142,7 +142,7 @@ class RestDataPost(object):
         self._resource = resource
         self._payload = payload
         self._verify_ssl = verify_ssl
-        self.data = dict()
+        self.data = {}
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):

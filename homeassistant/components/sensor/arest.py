@@ -108,8 +108,7 @@ class ArestSensor(Entity):
                  pin=None, unit_of_measurement=None, renderer=None):
         self.arest = arest
         self._resource = resource
-        self._name = '{} {}'.format(location.title(), name.title()) \
-                     or DEVICE_DEFAULT_NAME
+        self._name = f'{location.title()} {name.title()}' or DEVICE_DEFAULT_NAME
         self._variable = variable
         self._pin = pin
         self._state = 'n/a'
@@ -118,8 +117,7 @@ class ArestSensor(Entity):
         self.update()
 
         if self._pin is not None:
-            request = requests.get('{}/mode/{}/i'.format
-                                   (self._resource, self._pin), timeout=10)
+            request = requests.get(f'{self._resource}/mode/{self._pin}/i', timeout=10)
             if request.status_code is not 200:
                 _LOGGER.error("Can't set mode. Is device offline?")
 
@@ -141,10 +139,9 @@ class ArestSensor(Entity):
         if 'error' in values:
             return values['error']
 
-        value = self._renderer(values.get('value',
-                                          values.get(self._variable,
-                                                     'N/A')))
-        return value
+        return self._renderer(
+            values.get('value', values.get(self._variable, 'N/A'))
+        )
 
     def update(self):
         """ Gets the latest data from aREST API. """
@@ -170,15 +167,13 @@ class ArestData(object):
             else:
                 try:
                     if str(self._pin[0]) == 'A':
-                        response = requests.get('{}/analog/{}'.format(
-                            self._resource, self._pin[1:]), timeout=10)
+                        response = requests.get(f'{self._resource}/analog/{self._pin[1:]}', timeout=10)
                         self.data = {'value': response.json()['return_value']}
                     else:
                         _LOGGER.error("Wrong pin naming. "
                                       "Please check your configuration file.")
                 except TypeError:
-                    response = requests.get('{}/digital/{}'.format(
-                        self._resource, self._pin), timeout=10)
+                    response = requests.get(f'{self._resource}/digital/{self._pin}', timeout=10)
                     self.data = {'value': response.json()['return_value']}
         except requests.exceptions.ConnectionError:
             _LOGGER.error("No route to device %s. Is device offline?",

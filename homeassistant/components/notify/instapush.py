@@ -35,8 +35,7 @@ def get_service(hass, config):
                'x-instapush-appsecret': config['app_secret']}
 
     try:
-        response = requests.get(_RESOURCE + 'events/list',
-                                headers=headers).json()
+        response = requests.get(f'{_RESOURCE}events/list', headers=headers).json()
     except ValueError:
         _LOGGER.error('Unexpected answer from Instapush API.')
         return None
@@ -45,7 +44,7 @@ def get_service(hass, config):
         _LOGGER.error(response['msg'])
         return None
 
-    if len([app for app in response if app['title'] == config['event']]) == 0:
+    if not [app for app in response if app['title'] == config['event']]:
         _LOGGER.error(
             "No app match your given value. "
             "Please create an app at https://instapush.im")
@@ -75,11 +74,16 @@ class InstapushNotificationService(BaseNotificationService):
 
         title = kwargs.get(ATTR_TITLE)
 
-        data = {"event": self._event,
-                "trackers": {self._tracker: title + " : " + message}}
+        data = {
+            "event": self._event,
+            "trackers": {self._tracker: f"{title} : {message}"},
+        }
 
-        response = requests.post(_RESOURCE + 'post', data=json.dumps(data),
-                                 headers=self._headers)
+
+        response = requests.post(
+            f'{_RESOURCE}post', data=json.dumps(data), headers=self._headers
+        )
+
 
         if response.json()['status'] == 401:
             _LOGGER.error(

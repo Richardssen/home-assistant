@@ -24,9 +24,7 @@ def setup_platform(hass, config, add_devices_callback, discovery_info=None):
     if discovery_info is not None:
         location = discovery_info[2]
         mac = discovery_info[3]
-        device = discovery.device_from_description(location, mac)
-
-        if device:
+        if device := discovery.device_from_description(location, mac):
             add_devices_callback([WemoSwitch(device)])
 
         return
@@ -50,7 +48,7 @@ class WemoSwitch(SwitchDevice):
     @property
     def unique_id(self):
         """ Returns the id of this WeMo switch """
-        return "{}.{}".format(self.__class__, self.wemo.serialnumber)
+        return f"{self.__class__}.{self.wemo.serialnumber}"
 
     @property
     def name(self):
@@ -86,20 +84,14 @@ class WemoSwitch(SwitchDevice):
             standby_state = self.insight_params['state']
             # Standby  is actually '8' but seems more defensive
             # to check for the On and Off states
-            if standby_state == '1' or standby_state == '0':
-                return False
-            else:
-                return True
+            return standby_state not in ['1', '0']
 
     @property
     def sensor_state(self):
         """ Is the sensor on or off. """
         if self.maker_params and self.has_sensor:
             # Note a state of 1 matches the WeMo app 'not triggered'!
-            if self.maker_params['sensorstate']:
-                return STATE_OFF
-            else:
-                return STATE_ON
+            return STATE_OFF if self.maker_params['sensorstate'] else STATE_ON
 
     @property
     def switch_mode(self):

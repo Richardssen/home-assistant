@@ -58,9 +58,9 @@ class ZwaveSwitch(SwitchDevice):
     @property
     def name(self):
         """ Returns the name of the device if any. """
-        name = self._node.name or "{}".format(self._node.product_name)
+        name = self._node.name or f"{self._node.product_name}"
 
-        return "{}".format(name or self._value.label)
+        return f"{name or self._value.label}"
 
     @property
     def is_on(self):

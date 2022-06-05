@@ -5,8 +5,10 @@ from homeassistant.const import __version__
 
 PACKAGE_NAME = 'homeassistant'
 HERE = os.path.abspath(os.path.dirname(__file__))
-DOWNLOAD_URL = ('https://github.com/balloob/home-assistant/archive/'
-                '{}.zip'.format(__version__))
+DOWNLOAD_URL = (
+    f'https://github.com/balloob/home-assistant/archive/{__version__}.zip'
+)
+
 
 PACKAGES = find_packages(exclude=['tests', 'tests.*'])
 
